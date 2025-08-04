@@ -232,21 +232,21 @@ export default function Chapters({ projectId }: ChaptersProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-primary-50 rounded-lg p-4">
                 <h4 className="font-medium text-primary-700 mb-2">起</h4>
-                <p className="text-sm text-secondary-500">主人公の日常と事件の発端</p>
+                <p className="text-sm text-muted-foreground">主人公の日常と事件の発端</p>
                 <div className="text-xs text-primary-600 mt-2">
                   {chapters.filter(ch => ch.structure === "ki").length}章
                 </div>
               </div>
               <div className="bg-orange-50 rounded-lg p-4">
                 <h4 className="font-medium text-orange-700 mb-2">承・転</h4>
-                <p className="text-sm text-secondary-500">冒険の開始と試練</p>
+                <p className="text-sm text-muted-foreground">冒険の開始と試練</p>
                 <div className="text-xs text-orange-600 mt-2">
                   {chapters.filter(ch => ["sho", "ten"].includes(ch.structure)).length}章
                 </div>
               </div>
               <div className="bg-green-50 rounded-lg p-4">
                 <h4 className="font-medium text-green-700 mb-2">結</h4>
-                <p className="text-sm text-secondary-500">クライマックスと解決</p>
+                <p className="text-sm text-muted-foreground">クライマックスと解決</p>
                 <div className="text-xs text-green-600 mt-2">
                   {chapters.filter(ch => ch.structure === "ketsu").length}章
                 </div>
@@ -279,6 +279,10 @@ export default function Chapters({ projectId }: ChaptersProps) {
                     characters={characters}
                     onChange={setNewChapter}
                     onSave={handleCreateChapter}
+                    onCancel={() => {
+                      resetForm();
+                      setDialogOpen(false);
+                    }}
                     isLoading={createChapterMutation.isPending}
                     title="新しい章を作成"
                   />
@@ -313,6 +317,10 @@ export default function Chapters({ projectId }: ChaptersProps) {
                     characters={characters}
                     onChange={setNewChapter}
                     onSave={handleCreateChapter}
+                    onCancel={() => {
+                      resetForm();
+                      setDialogOpen(false);
+                    }}
                     isLoading={createChapterMutation.isPending}
                     title="新しい章を作成"
                   />
@@ -511,6 +519,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
             characters={characters}
             onChange={setEditingChapter}
             onSave={handleUpdateChapter}
+            onCancel={() => setEditingChapter(null)}
             isLoading={updateChapterMutation.isPending}
             title="章を編集"
           />
@@ -525,11 +534,17 @@ interface ChapterDialogProps {
   characters: Character[];
   onChange: (chapter: any) => void;
   onSave: (chapter: any) => void;
+  onCancel: () => void;
   isLoading: boolean;
   title: string;
 }
 
-function ChapterDialog({ chapter, characters, onChange, onSave, isLoading, title }: ChapterDialogProps) {
+function ChapterDialog({ chapter, characters, onChange, onSave, onCancel, isLoading, title }: ChapterDialogProps) {
+  // nullチェックを追加
+  if (!chapter) {
+    return null;
+  }
+
   return (
     <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
       <DialogHeader>
@@ -543,7 +558,7 @@ function ChapterDialog({ chapter, characters, onChange, onSave, isLoading, title
               id="title"
               data-testid="input-chapter-title"
               placeholder="例: 星の呼び声"
-              value={chapter.title}
+              value={chapter.title || ""}
               onChange={(e) => onChange({ ...chapter, title: e.target.value })}
             />
           </div>
@@ -631,7 +646,7 @@ function ChapterDialog({ chapter, characters, onChange, onSave, isLoading, title
         <div className="flex justify-end space-x-2 pt-4">
           <Button 
             variant="outline" 
-            onClick={() => onChange(null)}
+            onClick={onCancel}
             data-testid="button-cancel-chapter"
           >
             キャンセル

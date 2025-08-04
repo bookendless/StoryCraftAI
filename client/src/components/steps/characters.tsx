@@ -203,6 +203,10 @@ export default function Characters({ projectId }: CharactersProps) {
                   character={newCharacter}
                   onChange={setNewCharacter}
                   onSave={handleCreateCharacter}
+                  onCancel={() => {
+                    resetForm();
+                    setDialogOpen(false);
+                  }}
                   isLoading={createCharacterMutation.isPending}
                   title="新しいキャラクターを作成"
                 />
@@ -236,6 +240,10 @@ export default function Characters({ projectId }: CharactersProps) {
                   character={newCharacter}
                   onChange={setNewCharacter}
                   onSave={handleCreateCharacter}
+                  onCancel={() => {
+                    resetForm();
+                    setDialogOpen(false);
+                  }}
                   isLoading={createCharacterMutation.isPending}
                   title="新しいキャラクターを作成"
                 />
@@ -326,6 +334,7 @@ export default function Characters({ projectId }: CharactersProps) {
             character={editingCharacter}
             onChange={setEditingCharacter}
             onSave={handleUpdateCharacter}
+            onCancel={() => setEditingCharacter(null)}
             isLoading={updateCharacterMutation.isPending}
             title="キャラクターを編集"
           />
@@ -339,11 +348,17 @@ interface CharacterDialogProps {
   character: any;
   onChange: (character: any) => void;
   onSave: (character: any) => void;
+  onCancel: () => void;
   isLoading: boolean;
   title: string;
 }
 
-function CharacterDialog({ character, onChange, onSave, isLoading, title }: CharacterDialogProps) {
+function CharacterDialog({ character, onChange, onSave, onCancel, isLoading, title }: CharacterDialogProps) {
+  // nullチェックを追加
+  if (!character) {
+    return null;
+  }
+
   return (
     <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
       <DialogHeader>
@@ -357,7 +372,7 @@ function CharacterDialog({ character, onChange, onSave, isLoading, title }: Char
               id="name"
               data-testid="input-character-name"
               placeholder="例: アリス"
-              value={character.name}
+              value={character.name || ""}
               onChange={(e) => onChange({ ...character, name: e.target.value })}
             />
           </div>
@@ -412,7 +427,7 @@ function CharacterDialog({ character, onChange, onSave, isLoading, title }: Char
         <div className="flex justify-end space-x-2 pt-4">
           <Button 
             variant="outline" 
-            onClick={() => onChange(null)}
+            onClick={onCancel}
             data-testid="button-cancel-character"
           >
             キャンセル

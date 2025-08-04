@@ -3,73 +3,75 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(315, 100%, 99%);
-  --foreground: hsl(240, 5%, 11%);
-  --muted: hsl(300, 20%, 96%);
-  --muted-foreground: hsl(240, 4%, 46%);
-  --popover: hsl(315, 100%, 99%);
-  --popover-foreground: hsl(240, 5%, 11%);
-  --card: hsl(315, 100%, 99%);
-  --card-foreground: hsl(240, 5%, 11%);
-  --border: hsl(240, 6%, 90%);
-  --input: hsl(240, 6%, 90%);
-  --primary: hsl(263, 70%, 54%);
-  --primary-foreground: hsl(263, 100%, 99%);
-  --secondary: hsl(300, 20%, 96%);
-  --secondary-foreground: hsl(240, 6%, 10%);
-  --accent: hsl(300, 20%, 96%);
-  --accent-foreground: hsl(240, 6%, 10%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(60, 9%, 98%);
-  --ring: hsl(240, 5%, 11%);
+  /* セピア基調のライトモード */
+  --background: hsl(48, 15%, 94%);
+  --foreground: hsl(30, 8%, 25%);
+  --muted: hsl(45, 20%, 90%);
+  --muted-foreground: hsl(35, 12%, 55%);
+  --popover: hsl(48, 20%, 96%);
+  --popover-foreground: hsl(30, 8%, 25%);
+  --card: hsl(48, 20%, 96%);
+  --card-foreground: hsl(30, 8%, 25%);
+  --border: hsl(40, 15%, 85%);
+  --input: hsl(45, 15%, 92%);
+  --primary: hsl(25, 65%, 45%);
+  --primary-foreground: hsl(48, 20%, 95%);
+  --secondary: hsl(45, 25%, 88%);
+  --secondary-foreground: hsl(30, 8%, 30%);
+  --accent: hsl(35, 45%, 75%);
+  --accent-foreground: hsl(30, 8%, 25%);
+  --destructive: hsl(0, 65%, 55%);
+  --destructive-foreground: hsl(48, 20%, 95%);
+  --ring: hsl(25, 65%, 45%);
   --radius: 0.5rem;
 
-  /* Material Design specific colors */
-  --primary-50: hsl(263, 100%, 97%);
-  --primary-100: hsl(263, 100%, 94%);
-  --primary-500: hsl(263, 70%, 54%);
-  --primary-600: hsl(263, 70%, 49%);
-  --primary-700: hsl(263, 70%, 44%);
+  /* セピア基調のMaterial Design色 */
+  --primary-50: hsl(45, 40%, 97%);
+  --primary-100: hsl(40, 35%, 94%);
+  --primary-500: hsl(25, 65%, 45%);
+  --primary-600: hsl(25, 65%, 40%);
+  --primary-700: hsl(25, 65%, 35%);
   
-  --secondary-500: hsl(240, 8%, 35%);
-  --secondary-600: hsl(240, 8%, 25%);
-  --secondary-700: hsl(240, 8%, 20%);
+  --secondary-500: hsl(35, 15%, 45%);
+  --secondary-600: hsl(30, 15%, 35%);
+  --secondary-700: hsl(30, 15%, 25%);
   
-  --surface-50: hsl(315, 100%, 99%);
-  --surface-100: hsl(300, 20%, 98%);
-  --surface-200: hsl(300, 20%, 96%);
-  --surface-300: hsl(240, 6%, 90%);
+  --surface-50: hsl(48, 20%, 98%);
+  --surface-100: hsl(45, 20%, 95%);
+  --surface-200: hsl(45, 20%, 90%);
+  --surface-300: hsl(40, 15%, 85%);
   
-  --outline: hsl(240, 5%, 48%);
-  --on-surface: hsl(240, 5%, 11%);
+  --outline: hsl(35, 12%, 55%);
+  --on-surface: hsl(30, 8%, 25%);
 }
 
 .dark {
-  --background: hsl(240, 10%, 4%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 4%, 16%);
-  --muted-foreground: hsl(240, 5%, 65%);
-  --popover: hsl(240, 10%, 4%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 4%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 4%, 16%);
-  --input: hsl(240, 4%, 16%);
-  --primary: hsl(263, 70%, 54%);
-  --primary-foreground: hsl(263, 100%, 99%);
-  --secondary: hsl(240, 4%, 16%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 4%, 16%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 63%, 31%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 5%, 84%);
+  /* ダークモード：コントラスト改善 */
+  --background: hsl(220, 15%, 8%);
+  --foreground: hsl(48, 15%, 92%);
+  --muted: hsl(220, 12%, 18%);
+  --muted-foreground: hsl(35, 8%, 65%);
+  --popover: hsl(220, 15%, 10%);
+  --popover-foreground: hsl(48, 15%, 90%);
+  --card: hsl(220, 15%, 10%);
+  --card-foreground: hsl(48, 15%, 90%);
+  --border: hsl(220, 12%, 20%);
+  --input: hsl(220, 12%, 15%);
+  --primary: hsl(35, 55%, 65%);
+  --primary-foreground: hsl(220, 15%, 8%);
+  --secondary: hsl(220, 12%, 15%);
+  --secondary-foreground: hsl(48, 15%, 85%);
+  --accent: hsl(35, 40%, 25%);
+  --accent-foreground: hsl(48, 15%, 85%);
+  --destructive: hsl(0, 65%, 55%);
+  --destructive-foreground: hsl(48, 15%, 90%);
+  --ring: hsl(35, 55%, 65%);
   --radius: 0.5rem;
 
-  /* Dark mode specific colors */
-  --secondary-500: hsl(240, 5%, 70%);
-  --secondary-600: hsl(240, 5%, 80%);
-  --secondary-700: hsl(240, 5%, 90%);
+  /* ダークモード用のMaterial Design色 */
+  --secondary-500: hsl(35, 8%, 70%);
+  --secondary-600: hsl(35, 8%, 80%);
+  --secondary-700: hsl(35, 8%, 90%);
 }
 
 @layer base {
