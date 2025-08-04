@@ -1,8 +1,18 @@
 import OpenAI from "openai";
 
+// API設定の動的取得
+function getApiConfig() {
+  return {
+    apiKey: process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || "your-api-key",
+    baseURL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
+    model: process.env.OPENAI_MODEL || 'gpt-4o'
+  };
+}
+
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || "your-api-key"
+  apiKey: getApiConfig().apiKey,
+  baseURL: getApiConfig().baseURL,
 });
 
 export interface CharacterSuggestion {

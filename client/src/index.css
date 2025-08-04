@@ -123,6 +123,10 @@
   color: hsl(240, 8%, 30%);
 }
 
+.icon-white-contrast {
+  color: hsl(240, 8%, 25%);
+}
+
 .dark .icon-default {
   color: hsl(240, 5%, 70%);
 }
@@ -133,6 +137,10 @@
 
 .dark .icon-secondary {
   color: hsl(240, 5%, 80%);
+}
+
+.dark .icon-white-contrast {
+  color: hsl(240, 5%, 85%);
 }
 
 .step-indicator.completed {

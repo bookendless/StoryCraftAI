@@ -10,6 +10,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { SettingsDialog } from "@/components/settings/settings-dialog";
 import type { Project } from "@shared/schema";
 
 interface SidebarProps {
@@ -70,7 +71,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
     if (status === "active") {
       return <Edit className="w-4 h-4 text-white" />;
     }
-    return <IconComponent className="w-4 h-4 icon-default" />;
+    return <IconComponent className="w-4 h-4 text-foreground" />;
   };
 
   return (
@@ -204,15 +205,21 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
 
       {/* Back to Home and Export Section */}
       <div className="p-6 border-t border-outline/10 space-y-3">
-        <Button
-          variant="outline"
-          onClick={() => setLocation("/")}
-          data-testid="button-back-home"
-          className={`w-full ${collapsed ? "px-3" : ""}`}
-        >
-          <Home className="w-4 h-4" />
-          {!collapsed && <span className="ml-2">ホームに戻る</span>}
-        </Button>
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setLocation("/")}
+            data-testid="button-back-home"
+            className={`${collapsed ? "w-full" : "flex-1 mr-2"}`}
+          >
+            <Home className="w-4 h-4" />
+            {!collapsed && <span className="ml-2">ホームに戻る</span>}
+          </Button>
+          
+          {!collapsed && (
+            <SettingsDialog />
+          )}
+        </div>
         
         <Button 
           className={`w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 material-transition elevation-1 ${
@@ -223,6 +230,12 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           <Download className="w-4 h-4" />
           {!collapsed && <span className="ml-2">エクスポート</span>}
         </Button>
+        
+        {collapsed && (
+          <div className="flex justify-center">
+            <SettingsDialog />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, BookOpen, Clock, Users } from "lucide-react";
+import { SettingsDialog } from "@/components/settings/settings-dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Project } from "@shared/schema";
@@ -90,21 +91,23 @@ export default function Home() {
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-on-surface">AIと共創するストーリービルダー</h1>
-                <p className="text-secondary-500">あなたの創造性を最大限に活かす執筆支援環境</p>
+                <h1 className="text-2xl font-bold text-on-surface dark:text-foreground">AIと共創するストーリービルダー</h1>
+                <p className="text-secondary-500 dark:text-muted-foreground">あなたの創造性を最大限に活かす執筆支援環境</p>
               </div>
             </div>
             
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  data-testid="button-create-project"
-                  className="bg-primary-500 hover:bg-primary-600 text-white elevation-2"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  新しいプロジェクト
-                </Button>
-              </DialogTrigger>
+            <div className="flex items-center space-x-2">
+              <SettingsDialog />
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    data-testid="button-create-project"
+                    className="bg-primary-500 hover:bg-primary-600 text-white elevation-2"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    新しいプロジェクト
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>新しいプロジェクトを作成</DialogTitle>
@@ -172,6 +175,7 @@ export default function Home() {
                 </div>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
         </div>
       </header>
