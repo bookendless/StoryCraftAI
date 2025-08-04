@@ -12,7 +12,7 @@ import {
 
 // Helper function for error handling
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? getErrorMessage(error) : 'Unknown error';
+  return error instanceof Error ? error.message : 'Unknown error';
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
