@@ -110,7 +110,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
         <div className="p-6 border-b border-outline/10">
           <div className="bg-primary-50 rounded-xl p-4">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-12 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-16 from-primary-500 to-primary-700 rounded-lg flex items-center justify-center bg-[#3bc7d1] ml-[0px] mr-[0px] pt-[0px] pb-[0px]">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
