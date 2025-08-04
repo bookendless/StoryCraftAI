@@ -71,7 +71,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
     if (status === "active") {
       return <Edit className="w-4 h-4 text-white" />;
     }
-    return <IconComponent className="w-4 h-4 text-foreground" />;
+    return <IconComponent className="w-4 h-4 icon-menu-colorful" />;
   };
 
   return (
@@ -99,9 +99,9 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
             size="sm"
             onClick={onToggle}
             data-testid="button-toggle-sidebar"
-            className="p-2 rounded-lg hover:bg-surface-200 material-transition"
+            className="p-1 rounded-lg material-transition"
           >
-            <Menu className="w-5 h-5 icon-default" />
+            <Menu className="w-5 h-5 icon-colorful" />
           </Button>
         </div>
       </div>
@@ -191,11 +191,11 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
                 )}
                 
                 {!collapsed && status === "completed" && (
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 icon-action-colorful" />
                 )}
                 
                 {!collapsed && status === "active" && (
-                  <Edit className="w-4 h-4 text-primary-500" />
+                  <Edit className="w-4 h-4 icon-action-colorful" />
                 )}
               </button>
             );
@@ -212,7 +212,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
             data-testid="button-back-home"
             className={`${collapsed ? "w-full" : "flex-1 mr-2"}`}
           >
-            <Home className="w-4 h-4" />
+            <Home className="w-4 h-4 icon-button-colorful" />
             {!collapsed && <span className="ml-2">ホームに戻る</span>}
           </Button>
           
@@ -227,7 +227,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           }`}
           data-testid="button-export"
         >
-          <Download className="w-4 h-4" />
+          <Download className="w-4 h-4 icon-button-colorful" />
           {!collapsed && <span className="ml-2">エクスポート</span>}
         </Button>
         
