@@ -8,24 +8,69 @@
 - Windows環境（EXEファイル作成時）
 - Git Bash または WSL（build-electron.shスクリプト実行時）
 
+## 重要な注意事項
+**Replit環境ではEXEファイルのビルドができません。** ローカル環境（Windows PC）で以下の手順を実行してください。
+
+## ローカル環境でのセットアップ
+
+### 1. プロジェクトをローカルにダウンロード
+```bash
+# Replitからプロジェクトをダウンロードまたはクローン
+git clone [your-replit-project-url]
+cd [project-folder]
+```
+
+### 2. package.jsonの修正が必要
+ローカル環境で以下の修正を行ってください：
+
+**package.jsonに追加する内容：**
+```json
+{
+  "name": "ai-story-builder",
+  "version": "1.0.0",
+  "description": "AIと共創するストーリービルダー - AI-powered collaborative story building application",
+  "author": "Story Builder Team",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "devDependencies": {
+    "electron": "^37.2.5",
+    "electron-builder": "^26.0.12"
+  }
+}
+```
+
+**dependencies から devDependencies に移動が必要なパッケージ：**
+- electron
+- electron-builder
+
 ## ビルド手順
 
-### 方法1: 自動ビルドスクリプト使用
+### ローカル環境でのビルド手順
+
+#### ステップ1: 依存関係のインストール
 ```bash
-# 実行権限を付与
+npm install
+```
+
+#### ステップ2: フロントエンドビルド
+```bash
+npm run build
+```
+
+#### ステップ3: EXEファイル作成
+```bash
+# Windows EXE作成
+npx electron-builder --config electron-builder.json --win --publish=never
+```
+
+#### 代替方法: 手動ビルドスクリプト
+package.jsonを修正後：
+```bash
+# 実行権限を付与（Mac/Linux）
 chmod +x build-electron.sh
 
 # ビルド実行
 ./build-electron.sh
-```
-
-### 方法2: 手動ビルド
-```bash
-# 1. フロントエンドビルド
-npm run build
-
-# 2. Windows EXE作成
-npx electron-builder --config electron-builder.json --win
 ```
 
 ## 出力ファイル
@@ -58,9 +103,23 @@ npx electron-builder --config electron-builder.json --win
 ## トラブルシューティング
 
 ### よくある問題
-1. **ビルドエラー**: `npm install` でパッケージを再インストール
-2. **権限エラー**: 管理者権限でコマンドプロンプトを実行
-3. **依存関係エラー**: Node.jsバージョンを確認（v18以上推奨）
+1. **"Package electron is only allowed in devDependencies"エラー**:
+   - package.jsonで `electron` と `electron-builder` を `dependencies` から `devDependencies` に移動
+
+2. **"description is missed"エラー**:
+   - package.jsonに `description` と `author` フィールドを追加
+
+3. **ビルドエラー**: 
+   - `npm install` でパッケージを再インストール
+   - Node.jsバージョンを確認（v18以上推奨）
+
+4. **権限エラー**: 
+   - Windows: 管理者権限でコマンドプロンプトを実行
+   - Mac/Linux: `sudo` を使用
+
+### Replit環境での制限
+- Replit環境ではElectronのビルドができません
+- プロジェクトをローカル環境にダウンロードしてビルドを実行してください
 
 ### デバッグモード
 開発時はElectronアプリを直接実行可能：
