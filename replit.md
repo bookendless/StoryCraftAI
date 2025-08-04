@@ -7,6 +7,21 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Communication language: Japanese
+
+## EXE Build Process
+
+The application is fully configured for creating Windows EXE files using Electron and Electron Builder. All necessary configuration files are in place:
+
+### Configuration Files:
+- `electron/main.js`: Main Electron process with Japanese menu system
+- `electron-builder.json`: Build configuration for Windows, macOS, and Linux
+- `build-electron.sh`: Automated build script
+
+### Build Instructions:
+1. Run the build script: `./build-electron.sh`
+2. The EXE file will be created in the `dist-electron` folder
+3. The app includes a full Japanese interface with native menu system
 
 ## System Architecture
 
@@ -61,3 +76,5 @@ Preferred communication style: Simple, everyday language.
 - **Vite**: Fast development server and build tool with React plugin
 - **PostCSS**: CSS processing with Tailwind and Autoprefixer
 - **ESModules**: Native ES module support throughout the application
+- **Electron**: Desktop application framework for creating native EXE files
+- **Electron Builder**: Build tool for packaging the app into distributable formats
