@@ -230,7 +230,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
           <div className="bg-surface-50 rounded-xl p-6 mb-6 elevation-1">
             <h3 className="text-lg font-medium text-on-surface mb-4">全体構成概要</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-primary-50 rounded-lg p-4">
+              <div className="rounded-lg p-4 bg-[#fdf0f0]">
                 <h4 className="font-medium text-primary-700 mb-2">起</h4>
                 <p className="text-sm text-muted-foreground">主人公の日常と事件の発端</p>
                 <div className="text-xs text-primary-600 mt-2">
@@ -436,7 +436,6 @@ export default function Chapters({ projectId }: ChaptersProps) {
           )}
         </div>
       </div>
-
       {/* Preview Panel */}
       <div className="w-80 bg-surface-50 border-l border-outline/10 p-6 overflow-y-auto custom-scrollbar">
         <h3 className="text-lg font-medium text-on-surface mb-4">構成プレビュー</h3>
@@ -512,7 +511,6 @@ export default function Chapters({ projectId }: ChaptersProps) {
           </div>
         </div>
       </div>
-
       {/* Edit Chapter Dialog */}
       {editingChapter && (
         <Dialog open={!!editingChapter} onOpenChange={() => setEditingChapter(null)}>
