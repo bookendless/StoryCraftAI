@@ -77,36 +77,33 @@
 /* フローティングボタンスタイル */
 .floating-button {
   background: hsl(var(--primary));
-  color: white !important;
+  color: hsl(var(--primary-foreground));
   @apply shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 ease-in-out;
 }
 
 .floating-button:hover {
   background: hsl(var(--primary) / 0.9);
-  color: white !important;
 }
 
 .floating-button-outline {
   background: hsl(var(--background));
   border: 1px solid hsl(var(--primary));
-  color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary));
   @apply shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ease-in-out;
 }
 
 .floating-button-outline:hover {
   background: hsl(var(--primary) / 0.1);
-  color: hsl(var(--primary)) !important;
 }
 
 .floating-icon-button {
   background: hsl(var(--primary));
-  color: white !important;
+  color: hsl(var(--primary-foreground));
   @apply shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 ease-in-out rounded-full;
 }
 
 .floating-icon-button:hover {
   background: hsl(var(--primary) / 0.9);
-  color: white !important;
 }
 
 /* Material Design エレベーション */
@@ -160,138 +157,18 @@
   background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
 }
 
-/* Icon visibility improvements - 控えめに改善 */
-.icon-default {
-  color: hsl(210, 40%, 40%);
+/* アイコンの視認性を自然に向上 */
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground));
 }
 
-.icon-muted {
-  color: hsl(210, 30%, 50%);
+.dark .text-muted-foreground {
+  color: hsl(var(--muted-foreground));
 }
 
-.icon-secondary {
-  color: hsl(210, 35%, 45%);
-}
 
-.icon-white-contrast {
-  color: hsl(210, 50%, 35%);
-}
 
-.dark .icon-default {
-  color: hsl(240, 5%, 70%);
-}
-
-.dark .icon-muted {
-  color: hsl(240, 5%, 60%);
-}
-
-.dark .icon-secondary {
-  color: hsl(240, 5%, 80%);
-}
-
-.dark .icon-white-contrast {
-  color: hsl(240, 5%, 85%);
-}
-
-/* プライマリボタンのみに強制的な色適用 */
-button[class*="bg-primary"], 
-.floating-button,
-.floating-icon-button {
-  color: white !important;
-  font-weight: 600 !important;
-}
-
-button[class*="bg-primary"] svg, 
-.floating-button svg,
-.floating-icon-button svg {
-  color: white !important;
-  stroke: white !important;
-  fill: white !important;
-  stroke-width: 2.5 !important;
-}
-
-/* 特定のボタンクラス */
-.floating-button,
-.floating-button *,
-.floating-button svg {
-  color: white !important;
-  stroke: white !important;
-  fill: white !important;
-}
-
-.floating-button-outline,
-.floating-button-outline * {
-  color: hsl(var(--primary)) !important;
-}
-
-.floating-button-outline svg {
-  color: hsl(var(--primary)) !important;
-  stroke: hsl(var(--primary)) !important;
-}
-
-.floating-icon-button,
-.floating-icon-button *,
-.floating-icon-button svg {
-  color: white !important;
-  stroke: white !important;
-  fill: white !important;
-}
-
-/* プライマリ色のボタン */
-.bg-primary,
-.bg-primary-500,
-.bg-primary-600,
-[class*="bg-primary"],
-button[class*="bg-primary"] {
-  color: white !important;
-  background-color: hsl(var(--primary)) !important;
-}
-
-.bg-primary svg,
-.bg-primary-500 svg,
-.bg-primary-600 svg,
-[class*="bg-primary"] svg,
-button[class*="bg-primary"] svg {
-  color: white !important;
-  stroke: white !important;
-  fill: white !important;
-}
-
-/* セカンダリボタン - 元の色を維持 */
-.bg-secondary,
-button[class*="bg-secondary"] {
-  color: hsl(var(--secondary-foreground));
-  background-color: hsl(var(--secondary));
-}
-
-/* アウトラインボタン - 元の色を維持 */
-.border-primary,
-button[class*="border-primary"] {
-  color: hsl(var(--primary));
-  border-color: hsl(var(--primary));
-}
-
-.border-primary svg,
-button[class*="border-primary"] svg {
-  color: hsl(var(--primary));
-  stroke: hsl(var(--primary));
-}
-
-/* タイトルとヘッダー - 適度なコントラスト */
-h1, h2, h3, h4, h5, h6 {
-  color: hsl(210, 40%, 25%);
-  font-weight: 600;
-}
-
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-  color: hsl(48, 15%, 90%);
-}
-
-/* 通常のアイコン - 元の動作を復元 */
-svg, .icon {
-  color: inherit;
-  stroke: currentColor;
-}
+/* デフォルトボタンスタイルを維持 - 強制設定を削除 */
 
 .step-indicator.completed {
   background: hsl(120, 60%, 50%);
