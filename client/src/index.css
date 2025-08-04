@@ -193,54 +193,100 @@
   color: hsl(240, 5%, 85%) !important;
 }
 
-/* ボタン内アイコンとテキストの色を強制 */
-.floating-button svg,
-.floating-button * {
+/* 全てのボタン要素に強制的な色適用 */
+button, .btn, [role="button"] {
   color: white !important;
+  font-weight: 600 !important;
 }
 
-.floating-button-outline svg,
+button svg, .btn svg, [role="button"] svg {
+  color: white !important;
+  stroke: white !important;
+  fill: white !important;
+  stroke-width: 2.5 !important;
+}
+
+/* 特定のボタンクラス */
+.floating-button,
+.floating-button *,
+.floating-button svg {
+  color: white !important;
+  stroke: white !important;
+  fill: white !important;
+}
+
+.floating-button-outline,
 .floating-button-outline * {
   color: hsl(var(--primary)) !important;
 }
 
-.floating-icon-button svg,
-.floating-icon-button * {
-  color: white !important;
+.floating-button-outline svg {
+  color: hsl(var(--primary)) !important;
+  stroke: hsl(var(--primary)) !important;
 }
 
-/* プライマリボタンのテキストとアイコンを白に強制 */
+.floating-icon-button,
+.floating-icon-button *,
+.floating-icon-button svg {
+  color: white !important;
+  stroke: white !important;
+  fill: white !important;
+}
+
+/* プライマリ色のボタン */
+.bg-primary,
 .bg-primary-500,
 .bg-primary-600,
-button[class*="bg-primary-"] {
+[class*="bg-primary"],
+button[class*="bg-primary"] {
   color: white !important;
+  background-color: hsl(var(--primary)) !important;
 }
 
+.bg-primary svg,
 .bg-primary-500 svg,
 .bg-primary-600 svg,
-button[class*="bg-primary-"] svg,
-.bg-primary-500 *,
-.bg-primary-600 *,
-button[class*="bg-primary-"] * {
+[class*="bg-primary"] svg,
+button[class*="bg-primary"] svg {
   color: white !important;
+  stroke: white !important;
+  fill: white !important;
 }
 
-/* タイトルとアイコンのコントラスト改善 */
+/* セカンダリボタン */
+.bg-secondary,
+button[class*="bg-secondary"] {
+  color: hsl(var(--secondary-foreground)) !important;
+  background-color: hsl(var(--secondary)) !important;
+}
+
+/* アウトラインボタン */
+.border-primary,
+button[class*="border-primary"] {
+  color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+}
+
+.border-primary svg,
+button[class*="border-primary"] svg {
+  color: hsl(var(--primary)) !important;
+  stroke: hsl(var(--primary)) !important;
+}
+
+/* タイトルとヘッダー */
 h1, h2, h3, h4, h5, h6 {
   color: hsl(200, 80%, 20%) !important;
+  font-weight: 700 !important;
 }
 
 .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
   color: hsl(48, 15%, 90%) !important;
 }
 
-/* ボタンテキストの視認性向上 */
-button {
-  font-weight: 500;
-}
-
-button svg {
-  stroke-width: 2;
+/* アイコンの強制色設定 */
+svg, .icon {
+  color: inherit !important;
+  stroke: currentColor !important;
 }
 
 .step-indicator.completed {
