@@ -70,10 +70,20 @@ export function ImageUpload({ imageUrl, onImageChange, placeholder = "画像を�
         throw new Error('ファイルのアップロードに失敗しました');
       }
 
-      // URLからオブジェクトパスを抽出
+      // アップロードされた画像のパスを正しく設定
+      console.log('Upload URL:', uploadURL);
       const url = new URL(uploadURL);
-      const objectPath = url.pathname;
-
+      const pathParts = url.pathname.split('/');
+      console.log('Path parts:', pathParts);
+      
+      // パスから uploads/ を取得して、objects パスに変換
+      const objectName = pathParts.slice(2).join('/'); // バケット名を除く
+      console.log('Object name:', objectName);
+      
+      // オブジェクトストレージのパス形式に変換
+      const objectPath = `/objects/${objectName}`;
+      console.log('Final object path:', objectPath);
+      
       onImageChange(objectPath);
 
       toast({

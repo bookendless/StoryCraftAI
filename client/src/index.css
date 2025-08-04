@@ -77,33 +77,36 @@
 /* フローティングボタンスタイル */
 .floating-button {
   background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  color: white !important;
   @apply shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 ease-in-out;
 }
 
 .floating-button:hover {
   background: hsl(var(--primary) / 0.9);
+  color: white !important;
 }
 
 .floating-button-outline {
   background: hsl(var(--background));
   border: 1px solid hsl(var(--primary));
-  color: hsl(var(--primary));
+  color: hsl(var(--primary)) !important;
   @apply shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ease-in-out;
 }
 
 .floating-button-outline:hover {
   background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary)) !important;
 }
 
 .floating-icon-button {
   background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  color: white !important;
   @apply shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 ease-in-out rounded-full;
 }
 
 .floating-icon-button:hover {
   background: hsl(var(--primary) / 0.9);
+  color: white !important;
 }
 
 /* Material Design エレベーション */
@@ -159,35 +162,85 @@
 
 /* Icon visibility improvements */
 .icon-default {
-  color: hsl(240, 8%, 35%);
+  color: hsl(200, 70%, 25%) !important;
 }
 
 .icon-muted {
-  color: hsl(240, 8%, 50%);
+  color: hsl(200, 60%, 35%) !important;
 }
 
 .icon-secondary {
-  color: hsl(240, 8%, 30%);
+  color: hsl(200, 65%, 30%) !important;
 }
 
 .icon-white-contrast {
-  color: hsl(240, 8%, 25%);
+  color: hsl(200, 80%, 20%) !important;
 }
 
 .dark .icon-default {
-  color: hsl(240, 5%, 70%);
+  color: hsl(240, 5%, 70%) !important;
 }
 
 .dark .icon-muted {
-  color: hsl(240, 5%, 60%);
+  color: hsl(240, 5%, 60%) !important;
 }
 
 .dark .icon-secondary {
-  color: hsl(240, 5%, 80%);
+  color: hsl(240, 5%, 80%) !important;
 }
 
 .dark .icon-white-contrast {
-  color: hsl(240, 5%, 85%);
+  color: hsl(240, 5%, 85%) !important;
+}
+
+/* ボタン内アイコンとテキストの色を強制 */
+.floating-button svg,
+.floating-button * {
+  color: white !important;
+}
+
+.floating-button-outline svg,
+.floating-button-outline * {
+  color: hsl(var(--primary)) !important;
+}
+
+.floating-icon-button svg,
+.floating-icon-button * {
+  color: white !important;
+}
+
+/* プライマリボタンのテキストとアイコンを白に強制 */
+.bg-primary-500,
+.bg-primary-600,
+button[class*="bg-primary-"] {
+  color: white !important;
+}
+
+.bg-primary-500 svg,
+.bg-primary-600 svg,
+button[class*="bg-primary-"] svg,
+.bg-primary-500 *,
+.bg-primary-600 *,
+button[class*="bg-primary-"] * {
+  color: white !important;
+}
+
+/* タイトルとアイコンのコントラスト改善 */
+h1, h2, h3, h4, h5, h6 {
+  color: hsl(200, 80%, 20%) !important;
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: hsl(48, 15%, 90%) !important;
+}
+
+/* ボタンテキストの視認性向上 */
+button {
+  font-weight: 500;
+}
+
+button svg {
+  stroke-width: 2;
 }
 
 .step-indicator.completed {
