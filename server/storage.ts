@@ -96,6 +96,7 @@ export class MemStorage implements IStorage {
       ...insertProject, 
       id, 
       description: insertProject.description ?? null,
+      imageUrl: insertProject.imageUrl ?? null,
       currentStep: insertProject.currentStep ?? 1,
       progress: insertProject.progress ?? 0,
       createdAt: now,
@@ -158,6 +159,8 @@ export class MemStorage implements IStorage {
       description: insertCharacter.description ?? null,
       personality: insertCharacter.personality ?? null,
       background: insertCharacter.background ?? null,
+      affiliation: insertCharacter.affiliation ?? null,
+      imageUrl: insertCharacter.imageUrl ?? null,
       order: insertCharacter.order ?? 0
     };
     this.characters.set(id, character);
