@@ -106,56 +106,64 @@
   background: hsl(var(--primary) / 0.9);
 }
 
-/* カラフルなアイコンスタイル */
+/* カラフルなアイコンスタイル - 透明度を改善 */
 .icon-colorful {
-  background: linear-gradient(135deg, hsl(195, 75%, 50%), hsl(25, 65%, 45%));
+  background: linear-gradient(135deg, hsl(195, 85%, 55%), hsl(25, 75%, 50%));
   color: white !important;
   padding: 0.5rem;
   border-radius: 0.5rem;
+  opacity: 0.95;
   @apply shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200 ease-in-out;
 }
 
 .icon-colorful:hover {
-  background: linear-gradient(135deg, hsl(195, 85%, 60%), hsl(25, 75%, 55%));
+  background: linear-gradient(135deg, hsl(195, 90%, 65%), hsl(25, 80%, 60%));
   transform: scale(1.15) rotate(5deg);
+  opacity: 1;
 }
 
 .icon-button-colorful {
-  background: linear-gradient(45deg, hsl(270, 60%, 70%), hsl(320, 60%, 70%));
+  background: linear-gradient(45deg, hsl(270, 70%, 65%), hsl(320, 70%, 65%));
   color: white !important;
   padding: 0.4rem;
   border-radius: 50%;
+  opacity: 0.92;
   @apply shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200 ease-in-out;
 }
 
 .icon-button-colorful:hover {
-  background: linear-gradient(45deg, hsl(270, 70%, 80%), hsl(320, 70%, 80%));
+  background: linear-gradient(45deg, hsl(270, 80%, 75%), hsl(320, 80%, 75%));
   transform: scale(1.2) rotate(-5deg);
+  opacity: 1;
 }
 
 .icon-menu-colorful {
-  background: linear-gradient(135deg, hsl(120, 60%, 60%), hsl(160, 60%, 60%));
+  background: linear-gradient(135deg, hsl(120, 70%, 55%), hsl(160, 70%, 55%));
   color: white !important;
   padding: 0.3rem;
   border-radius: 0.4rem;
+  opacity: 0.9;
   @apply shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 ease-in-out;
 }
 
 .icon-menu-colorful:hover {
-  background: linear-gradient(135deg, hsl(120, 70%, 70%), hsl(160, 70%, 70%));
+  background: linear-gradient(135deg, hsl(120, 80%, 65%), hsl(160, 80%, 65%));
+  opacity: 1;
 }
 
 .icon-action-colorful {
-  background: linear-gradient(135deg, hsl(30, 80%, 60%), hsl(60, 80%, 60%));
+  background: linear-gradient(135deg, hsl(30, 85%, 58%), hsl(60, 85%, 58%));
   color: white !important;
   padding: 0.25rem;
   border-radius: 0.3rem;
+  opacity: 0.9;
   @apply shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 ease-in-out;
 }
 
 .icon-action-colorful:hover {
-  background: linear-gradient(135deg, hsl(30, 90%, 70%), hsl(60, 90%, 70%));
+  background: linear-gradient(135deg, hsl(30, 95%, 68%), hsl(60, 95%, 68%));
   transform: scale(1.1) translateY(-1px);
+  opacity: 1;
 }
 
 /* Material Design エレベーション */
@@ -261,4 +269,54 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: var(--outline);
+}
+
+/* ボタンの透明度改善とカラフル背景 */
+.button-enhanced {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  color: hsl(var(--foreground)) !important;
+  transition: all 0.3s ease;
+}
+
+.button-enhanced:hover {
+  background: rgba(59, 130, 246, 0.25) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+.button-action {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.button-action:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+.button-success {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.button-success:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+/*透明度を控えめにしたボタン背景 */
+.button-subtle {
+  background: rgba(156, 163, 175, 0.1) !important;
+  border: 1px solid rgba(156, 163, 175, 0.2) !important;
+  transition: all 0.3s ease;
+}
+
+.button-subtle:hover {
+  background: rgba(156, 163, 175, 0.18) !important;
+  border-color: rgba(156, 163, 175, 0.3) !important;
 }

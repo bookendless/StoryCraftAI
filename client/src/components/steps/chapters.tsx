@@ -354,6 +354,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           size="sm"
                           onClick={() => setEditingChapter(chapter)}
                           data-testid={`button-edit-chapter-${chapter.id}`}
+                          className="button-enhanced"
                         >
                           <Edit className="w-4 h-4 icon-action-colorful" />
                         </Button>
@@ -361,6 +362,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           variant="ghost"
                           size="sm"
                           data-testid={`button-drag-chapter-${chapter.id}`}
+                          className="button-subtle"
                         >
                           <GripVertical className="w-4 h-4 icon-action-colorful" />
                         </Button>
@@ -369,7 +371,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           size="sm"
                           onClick={() => deleteChapterMutation.mutate(chapter.id)}
                           data-testid={`button-delete-chapter-${chapter.id}`}
-                          className="text-destructive hover:text-destructive"
+                          className="text-destructive hover:text-destructive button-action"
                         >
                           <Trash2 className="w-4 h-4 icon-action-colorful" />
                         </Button>

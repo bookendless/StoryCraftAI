@@ -360,6 +360,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
                               size="sm"
                               onClick={() => setEditingEpisode(episode)}
                               data-testid={`button-edit-episode-${episode.id}`}
+                              className="button-enhanced"
                             >
                               <Edit className="w-4 h-4 icon-action-colorful" />
                             </Button>
@@ -367,6 +368,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
                               variant="ghost"
                               size="sm"
                               data-testid={`button-drag-episode-${episode.id}`}
+                              className="button-subtle"
                             >
                               <GripVertical className="w-4 h-4 icon-action-colorful" />
                             </Button>
@@ -375,7 +377,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
                               size="sm"
                               onClick={() => deleteEpisodeMutation.mutate(episode.id)}
                               data-testid={`button-delete-episode-${episode.id}`}
-                              className="text-destructive hover:text-destructive"
+                              className="text-destructive hover:text-destructive button-action"
                             >
                               <Trash2 className="w-4 h-4 icon-action-colorful" />
                             </Button>

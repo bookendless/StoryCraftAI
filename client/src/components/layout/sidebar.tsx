@@ -99,7 +99,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
             size="sm"
             onClick={onToggle}
             data-testid="button-toggle-sidebar"
-            className="p-1 rounded-lg material-transition"
+            className="p-1 rounded-lg material-transition button-subtle"
           >
             <Menu className="w-5 h-5 icon-colorful" />
           </Button>
@@ -207,7 +207,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
             variant="outline"
             onClick={() => setLocation("/")}
             data-testid="button-back-home"
-            className={`${collapsed ? "w-full" : "flex-1 mr-2"}`}
+            className={`button-enhanced ${collapsed ? "w-full" : "flex-1 mr-2"}`}
           >
             <Home className="w-4 h-4 icon-button-colorful" />
             {!collapsed && <span className="ml-2">ホームに戻る</span>}
