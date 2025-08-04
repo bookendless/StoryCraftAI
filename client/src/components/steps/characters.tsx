@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Users, Sparkles, Edit, Trash2, Save } from "lucide-react";
+import { Plus, Users, Sparkles, Edit, Trash2, Save, ImageIcon } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Character } from "@shared/schema";
@@ -26,6 +27,8 @@ export default function Characters({ projectId }: CharactersProps) {
     personality: "",
     background: "",
     role: "",
+    affiliation: "",
+    imageUrl: "",
     order: 0
   });
 
@@ -126,6 +129,8 @@ export default function Characters({ projectId }: CharactersProps) {
       personality: "",
       background: "",
       role: "",
+      affiliation: "",
+      imageUrl: "",
       order: characters.length
     });
   };
@@ -257,17 +262,38 @@ export default function Characters({ projectId }: CharactersProps) {
                   className="card-hover material-transition elevation-1"
                   data-testid={`card-character-${character.id}`}
                 >
+                  {/* Character Image */}
+                  {character.imageUrl && (
+                    <div className="w-full h-32 overflow-hidden rounded-t-lg">
+                      <img
+                        src={character.imageUrl.startsWith('/objects/') ? character.imageUrl : `/public-objects/${character.imageUrl}`}
+                        alt={character.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
-                      <div>
+                      <div className="flex-1">
                         <CardTitle className="text-lg" data-testid={`text-character-name-${character.id}`}>
                           {character.name}
                         </CardTitle>
-                        {character.role && (
-                          <Badge variant="outline" className="mt-2">
-                            {character.role}
-                          </Badge>
-                        )}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {character.role && (
+                            <Badge variant="outline">
+                              {character.role}
+                            </Badge>
+                          )}
+                          {character.affiliation && (
+                            <Badge variant="secondary">
+                              {character.affiliation}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Button
@@ -365,6 +391,15 @@ function CharacterDialog({ character, onChange, onSave, onCancel, isLoading, tit
         <DialogTitle>{title}</DialogTitle>
       </DialogHeader>
       <div className="space-y-4 pt-4">
+        <div className="space-y-2">
+          <Label>参考画像（任意）</Label>
+          <ImageUpload
+            imageUrl={character.imageUrl || ""}
+            onImageChange={(url) => onChange({ ...character, imageUrl: url || "" })}
+            placeholder="キャラクターの参考画像をアップロード"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="name">キャラクター名 *</Label>
@@ -386,6 +421,17 @@ function CharacterDialog({ character, onChange, onSave, onCancel, isLoading, tit
               onChange={(e) => onChange({ ...character, role: e.target.value })}
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="affiliation">所属・組織（任意）</Label>
+          <Input
+            id="affiliation"
+            data-testid="input-character-affiliation"
+            placeholder="例: 魔法学院、騎士団、商会"
+            value={character.affiliation || ""}
+            onChange={(e) => onChange({ ...character, affiliation: e.target.value })}
+          />
         </div>
         
         <div className="space-y-2">

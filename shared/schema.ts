@@ -8,6 +8,7 @@ export const projects = pgTable("projects", {
   title: text("title").notNull(),
   genre: text("genre").notNull(),
   description: text("description"),
+  imageUrl: text("image_url"),
   currentStep: integer("current_step").notNull().default(1),
   progress: integer("progress").notNull().default(0),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
@@ -22,6 +23,8 @@ export const characters = pgTable("characters", {
   personality: text("personality"),
   background: text("background"),
   role: text("role"),
+  affiliation: text("affiliation"),
+  imageUrl: text("image_url"),
   order: integer("order").notNull().default(0),
 });
 

@@ -5,8 +5,11 @@ import {
   type Synopsis, type InsertSynopsis,
   type Chapter, type InsertChapter,
   type Episode, type InsertEpisode,
-  type Draft, type InsertDraft
+  type Draft, type InsertDraft,
+  projects, characters, plots, synopses, chapters, episodes, drafts
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -365,4 +368,186 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // Projects
+  async getProjects(): Promise<Project[]> {
+    return await db.select().from(projects);
+  }
+
+  async getProject(id: string): Promise<Project | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project;
+  }
+
+  async createProject(project: InsertProject): Promise<Project> {
+    const [created] = await db.insert(projects).values(project).returning();
+    return created;
+  }
+
+  async updateProject(id: string, updates: Partial<Project>): Promise<Project> {
+    const [updated] = await db.update(projects)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+    if (!updated) throw new Error("Project not found");
+    return updated;
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    await db.delete(projects).where(eq(projects.id, id));
+  }
+
+  // Characters
+  async getCharacters(projectId: string): Promise<Character[]> {
+    return await db.select().from(characters).where(eq(characters.projectId, projectId));
+  }
+
+  async getCharacter(id: string): Promise<Character | undefined> {
+    const [character] = await db.select().from(characters).where(eq(characters.id, id));
+    return character;
+  }
+
+  async createCharacter(character: InsertCharacter): Promise<Character> {
+    const [created] = await db.insert(characters).values(character).returning();
+    return created;
+  }
+
+  async updateCharacter(id: string, updates: Partial<Character>): Promise<Character> {
+    const [updated] = await db.update(characters)
+      .set(updates)
+      .where(eq(characters.id, id))
+      .returning();
+    if (!updated) throw new Error("Character not found");
+    return updated;
+  }
+
+  async deleteCharacter(id: string): Promise<void> {
+    await db.delete(characters).where(eq(characters.id, id));
+  }
+
+  // Plots
+  async getPlot(projectId: string): Promise<Plot | undefined> {
+    const [plot] = await db.select().from(plots).where(eq(plots.projectId, projectId));
+    return plot;
+  }
+
+  async createPlot(plot: InsertPlot): Promise<Plot> {
+    const [created] = await db.insert(plots).values(plot).returning();
+    return created;
+  }
+
+  async updatePlot(id: string, updates: Partial<Plot>): Promise<Plot> {
+    const [updated] = await db.update(plots)
+      .set(updates)
+      .where(eq(plots.id, id))
+      .returning();
+    if (!updated) throw new Error("Plot not found");
+    return updated;
+  }
+
+  // Synopses
+  async getSynopsis(projectId: string): Promise<Synopsis | undefined> {
+    const [synopsis] = await db.select().from(synopses).where(eq(synopses.projectId, projectId));
+    return synopsis;
+  }
+
+  async createSynopsis(synopsis: InsertSynopsis): Promise<Synopsis> {
+    const [created] = await db.insert(synopses).values(synopsis).returning();
+    return created;
+  }
+
+  async updateSynopsis(id: string, updates: Partial<Synopsis>): Promise<Synopsis> {
+    const [updated] = await db.update(synopses)
+      .set(updates)
+      .where(eq(synopses.id, id))
+      .returning();
+    if (!updated) throw new Error("Synopsis not found");
+    return updated;
+  }
+
+  // Chapters
+  async getChapters(projectId: string): Promise<Chapter[]> {
+    return await db.select().from(chapters).where(eq(chapters.projectId, projectId));
+  }
+
+  async getChapter(id: string): Promise<Chapter | undefined> {
+    const [chapter] = await db.select().from(chapters).where(eq(chapters.id, id));
+    return chapter;
+  }
+
+  async createChapter(chapter: InsertChapter): Promise<Chapter> {
+    const [created] = await db.insert(chapters).values(chapter).returning();
+    return created;
+  }
+
+  async updateChapter(id: string, updates: Partial<Chapter>): Promise<Chapter> {
+    const [updated] = await db.update(chapters)
+      .set(updates)
+      .where(eq(chapters.id, id))
+      .returning();
+    if (!updated) throw new Error("Chapter not found");
+    return updated;
+  }
+
+  async deleteChapter(id: string): Promise<void> {
+    await db.delete(chapters).where(eq(chapters.id, id));
+  }
+
+  // Episodes
+  async getEpisodes(chapterId: string): Promise<Episode[]> {
+    return await db.select().from(episodes).where(eq(episodes.chapterId, chapterId));
+  }
+
+  async getEpisode(id: string): Promise<Episode | undefined> {
+    const [episode] = await db.select().from(episodes).where(eq(episodes.id, id));
+    return episode;
+  }
+
+  async createEpisode(episode: InsertEpisode): Promise<Episode> {
+    const [created] = await db.insert(episodes).values(episode).returning();
+    return created;
+  }
+
+  async updateEpisode(id: string, updates: Partial<Episode>): Promise<Episode> {
+    const [updated] = await db.update(episodes)
+      .set(updates)
+      .where(eq(episodes.id, id))
+      .returning();
+    if (!updated) throw new Error("Episode not found");
+    return updated;
+  }
+
+  async deleteEpisode(id: string): Promise<void> {
+    await db.delete(episodes).where(eq(episodes.id, id));
+  }
+
+  // Drafts
+  async getDrafts(episodeId: string): Promise<Draft[]> {
+    return await db.select().from(drafts).where(eq(drafts.episodeId, episodeId));
+  }
+
+  async getDraft(id: string): Promise<Draft | undefined> {
+    const [draft] = await db.select().from(drafts).where(eq(drafts.id, id));
+    return draft;
+  }
+
+  async createDraft(draft: InsertDraft): Promise<Draft> {
+    const [created] = await db.insert(drafts).values(draft).returning();
+    return created;
+  }
+
+  async updateDraft(id: string, updates: Partial<Draft>): Promise<Draft> {
+    const [updated] = await db.update(drafts)
+      .set(updates)
+      .where(eq(drafts.id, id))
+      .returning();
+    if (!updated) throw new Error("Draft not found");
+    return updated;
+  }
+
+  async deleteDraft(id: string): Promise<void> {
+    await db.delete(drafts).where(eq(drafts.id, id));
+  }
+}
+
+export const storage = new DatabaseStorage();
