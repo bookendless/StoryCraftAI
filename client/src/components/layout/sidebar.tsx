@@ -85,7 +85,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 from-primary-500 to-primary-700 rounded-lg flex items-center justify-center bg-[#3bc7d1]">
                 <BookOpen className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -105,7 +105,6 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           </Button>
         </div>
       </div>
-
       {/* Project Info */}
       {!collapsed && (
         <div className="p-6 border-b border-outline/10">
@@ -140,7 +139,6 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           </div>
         </div>
       )}
-
       {/* Step Navigation */}
       <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
         {!collapsed && (
@@ -202,7 +200,6 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           })}
         </nav>
       </div>
-
       {/* Back to Home and Export Section */}
       <div className="p-6 border-t border-outline/10 space-y-3">
         <div className="flex items-center justify-between">
