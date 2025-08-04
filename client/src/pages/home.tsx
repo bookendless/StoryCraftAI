@@ -180,7 +180,7 @@ export default function Home() {
                 <DialogTrigger asChild>
                   <Button 
                     data-testid="button-create-project"
-                    className="hover:bg-primary-600 text-white elevation-2 bg-[#2a2c3700]"
+                    className="hover:bg-primary-600 text-white elevation-2 bg-[#f2f1ed]"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     新しいプロジェクト
