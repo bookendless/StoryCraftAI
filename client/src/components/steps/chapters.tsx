@@ -268,7 +268,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                   <DialogTrigger asChild>
                     <Button 
                       data-testid="button-create-first-chapter"
-                      className="bg-primary-500 hover:bg-primary-600 text-white"
+                      className="floating-button"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       章を作成
@@ -288,10 +288,10 @@ export default function Chapters({ projectId }: ChaptersProps) {
                   />
                 </Dialog>
                 <Button
-                  variant="outline"
                   onClick={() => generateChaptersMutation.mutate()}
                   disabled={generateChaptersMutation.isPending}
                   data-testid="button-ai-suggest-chapters"
+                  className="floating-button-outline"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   AI提案
@@ -306,7 +306,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                   <DialogTrigger asChild>
                     <Button 
                       data-testid="button-add-chapter"
-                      className="bg-primary-500 hover:bg-primary-600 text-white"
+                      className="floating-button"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       章を追加
@@ -395,7 +395,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                         </Badge>
                         {chapter.characterIds && Array.isArray(chapter.characterIds) && chapter.characterIds.length > 0 && (
                           <Badge variant="outline" data-testid={`badge-chapter-characters-${chapter.id}`}>
-                            {(chapter.characterIds as string[]).length}名登場
+                            {chapter.characterIds.length}名登場
                           </Badge>
                         )}
                       </div>

@@ -168,7 +168,7 @@ export default function Characters({ projectId }: CharactersProps) {
               onClick={() => generateCharactersMutation.mutate()}
               disabled={generateCharactersMutation.isPending}
               data-testid="button-ai-generate-characters"
-              className="bg-primary-500 hover:bg-primary-600 text-white"
+              className="floating-button-outline"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               {generateCharactersMutation.isPending ? "AI生成中..." : "AI補完"}
@@ -193,7 +193,7 @@ export default function Characters({ projectId }: CharactersProps) {
                 <DialogTrigger asChild>
                   <Button 
                     data-testid="button-create-first-character"
-                    className="bg-primary-500 hover:bg-primary-600 text-white"
+                    className="floating-button"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     キャラクターを作成
@@ -212,10 +212,10 @@ export default function Characters({ projectId }: CharactersProps) {
                 />
               </Dialog>
               <Button
-                variant="outline"
                 onClick={() => generateCharactersMutation.mutate()}
                 disabled={generateCharactersMutation.isPending}
                 data-testid="button-ai-suggest-characters"
+                className="floating-button-outline"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 AI提案
@@ -230,7 +230,7 @@ export default function Characters({ projectId }: CharactersProps) {
                 <DialogTrigger asChild>
                   <Button 
                     data-testid="button-add-character"
-                    className="bg-primary-500 hover:bg-primary-600 text-white"
+                    className="floating-button"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     キャラクター追加

@@ -26,6 +26,7 @@ export function SettingsDialog() {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const [apiProvider, setApiProvider] = useState(() => localStorage.getItem("api-provider") || "openai");
+  const [apiModel, setApiModel] = useState(() => localStorage.getItem("api-model") || "gpt-4o");
   const [apiKey, setApiKey] = useState("");
   const [apiEndpoint, setApiEndpoint] = useState(() => localStorage.getItem("api-endpoint") || "");
 
@@ -37,12 +38,38 @@ export function SettingsDialog() {
       localStorage.setItem("api-endpoint", apiEndpoint);
     }
     localStorage.setItem("api-provider", apiProvider);
+    localStorage.setItem("api-model", apiModel);
     
     toast({
       title: "設定を保存しました",
       description: "API設定が正常に保存されました。",
     });
     setApiKey("");
+  };
+
+  const getModelOptions = (provider: string) => {
+    switch (provider) {
+      case "openai":
+        return [
+          { value: "gpt-4o", label: "GPT-4o" },
+          { value: "gpt-4o-mini", label: "GPT-4o Mini" },
+          { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+          { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" }
+        ];
+      case "google":
+        return [
+          { value: "gemini-2.0-flash-exp", label: "Gemini 2.0 Flash" },
+          { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
+          { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" }
+        ];
+      case "anthropic":
+        return [
+          { value: "claude-3.5-sonnet", label: "Claude 3.5 Sonnet" },
+          { value: "claude-3-haiku", label: "Claude 3 Haiku" }
+        ];
+      default:
+        return [];
+    }
   };
 
   const getThemeIcon = () => {
@@ -135,6 +162,22 @@ export function SettingsDialog() {
                   onChange={(e) => setApiKey(e.target.value)}
                   data-testid="input-api-key"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="api-model">AIモデル</Label>
+                <Select value={apiModel} onValueChange={setApiModel}>
+                  <SelectTrigger data-testid="select-api-model">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getModelOptions(apiProvider).map((model) => (
+                      <SelectItem key={model.value} value={model.value}>
+                        {model.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {(apiProvider === "custom" || apiEndpoint) && (
