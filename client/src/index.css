@@ -275,37 +275,40 @@
 .button-enhanced {
   background: rgba(59, 130, 246, 0.15) !important;
   border: 1px solid rgba(59, 130, 246, 0.3) !important;
-  color: hsl(var(--foreground)) !important;
+  color: #1b6e98 !important;
   transition: all 0.3s ease;
 }
 
 .button-enhanced:hover {
   background: rgba(59, 130, 246, 0.25) !important;
   border-color: rgba(59, 130, 246, 0.4) !important;
+  color: #1b6e98 !important;
   transform: translateY(-1px);
 }
 
 .button-action {
   background: rgba(239, 68, 68, 0.12) !important;
   border: 1px solid rgba(239, 68, 68, 0.25) !important;
-  color: hsl(var(--foreground)) !important;
+  color: #1b6e98 !important;
 }
 
 .button-action:hover {
   background: rgba(239, 68, 68, 0.2) !important;
   border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #1b6e98 !important;
   transform: translateY(-1px);
 }
 
 .button-success {
   background: rgba(16, 185, 129, 0.12) !important;
   border: 1px solid rgba(16, 185, 129, 0.25) !important;
-  color: hsl(var(--foreground)) !important;
+  color: #1b6e98 !important;
 }
 
 .button-success:hover {
   background: rgba(16, 185, 129, 0.2) !important;
   border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #1b6e98 !important;
   transform: translateY(-1px);
 }
 
@@ -313,10 +316,59 @@
 .button-subtle {
   background: rgba(156, 163, 175, 0.1) !important;
   border: 1px solid rgba(156, 163, 175, 0.2) !important;
+  color: #1b6e98 !important;
   transition: all 0.3s ease;
 }
 
 .button-subtle:hover {
   background: rgba(156, 163, 175, 0.18) !important;
   border-color: rgba(156, 163, 175, 0.3) !important;
+  color: #1b6e98 !important;
+}
+
+/* すべてのボタンテキストカラーを#1b6e98に変更 */
+button, .btn, [role="button"], .button,
+.inline-flex, .shadow, .text-white,
+button[class*="inline-flex"], 
+[class*="Button"], [class*="button"] {
+  color: #1b6e98 !important;
+}
+
+/* 特定のボタンコンポーネントのテキストカラー */
+button.inline-flex,
+.inline-flex[role="button"],
+button[data-testid*="button"],
+[data-testid*="button"] button {
+  color: #1b6e98 !important;
+}
+
+/* ホバー状態でもテキストカラーを維持 */
+button:hover, .btn:hover, [role="button"]:hover,
+button[class*="inline-flex"]:hover,
+[class*="Button"]:hover, [class*="button"]:hover {
+  color: #1b6e98 !important;
+}
+
+/* UI コンポーネントライブラリ用の具体的なターゲティング */
+[class*="ui-button"], [class*="radix-button"],
+.inline-flex.items-center.justify-center,
+button[class*="whitespace-nowrap"],
+button[class*="rounded-md"],
+button[class*="font-medium"],
+[role="button"][class*="inline-flex"] {
+  color: #1b6e98 !important;
+}
+
+/* アクション系ボタンのテキストカラー */
+button[data-testid], [data-testid*="button"],
+button.elevation-2, button.elevation-1,
+.DialogTrigger button, .AlertDialogAction,
+.AlertDialogCancel, .DropdownMenuItem {
+  color: #1b6e98 !important;
+}
+
+/* フォーカス状態とアクティブ状態 */
+button:focus, button:active, 
+[role="button"]:focus, [role="button"]:active {
+  color: #1b6e98 !important;
 }
