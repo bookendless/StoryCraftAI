@@ -107,16 +107,97 @@ export default function Chapters() {
     return "未分類";
   };
 
+  const createChapterMutation = useMutation({
+    mutationFn: async (chapterData: any) => {
+      const response = await apiRequest("POST", `/api/projects/${projectId}/chapters`, chapterData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      toast({
+        title: "章作成完了",
+        description: "新しい章を追加しました。",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "エラー",
+        description: "章の作成に失敗しました。",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateChapterMutation = useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string } & any) => {
+      const response = await apiRequest("PATCH", `/api/chapters/${id}`, updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      toast({
+        title: "章更新完了",
+        description: "章を更新しました。",
+      });
+    },
+  });
+
+  const deleteChapterMutation = useMutation({
+    mutationFn: async (chapterId: string) => {
+      await apiRequest("DELETE", `/api/chapters/${chapterId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      toast({
+        title: "章削除完了",
+        description: "章を削除しました。",
+      });
+    },
+  });
+
   const addChapter = () => {
-    // Add chapter logic here
+    const newChapter = {
+      title: `第${chapters.length + 1}章`,
+      summary: "",
+      structure: getStructureForChapter(chapters.length + 1),
+      order: chapters.length,
+      estimatedWords: Math.ceil(estimatedLength / totalChapters),
+      estimatedReadingTime: Math.ceil(estimatedLength / totalChapters / 250), // 250文字/分の読書速度
+      characterIds: [],
+      projectId
+    };
+    
+    createChapterMutation.mutate(newChapter);
   };
 
-  const updateChapter = (index: number, updates: any) => {
-    // Update chapter logic here
+  const updateChapter = (chapterIndex: number, updates: any) => {
+    const chapter = chapters[chapterIndex];
+    if (chapter) {
+      updateChapterMutation.mutate({ id: chapter.id, ...updates });
+    }
   };
 
-  const removeChapter = (index: number) => {
-    // Remove chapter logic here
+  const removeChapter = (chapterIndex: number) => {
+    const chapter = chapters[chapterIndex];
+    if (chapter) {
+      deleteChapterMutation.mutate(chapter.id);
+    }
+  };
+
+  const getStructureForChapter = (chapterNumber: number) => {
+    if (structure === "kishotenketsu") {
+      const chapterDistribution = Math.ceil(totalChapters / 4);
+      if (chapterNumber <= chapterDistribution) return "ki";
+      if (chapterNumber <= chapterDistribution * 2) return "sho";
+      if (chapterNumber <= chapterDistribution * 3) return "ten";
+      return "ketsu";
+    } else {
+      const act1 = Math.ceil(totalChapters * 0.25);
+      const act2 = Math.ceil(totalChapters * 0.5);
+      if (chapterNumber <= act1) return "act1";
+      if (chapterNumber <= act1 + act2) return "act2";
+      return "act3";
+    }
   };
 
   const generateChapters = () => {
@@ -263,7 +344,7 @@ export default function Chapters() {
             <CardContent className="flex-1 overflow-y-auto min-h-0">
               <div className="space-y-4">
                 {chapters.map((chapter: Chapter, index: number) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-3" data-testid={`chapter-card-${index}`}>
+                  <div key={chapter.id} className="border rounded-lg p-4 space-y-3" data-testid={`chapter-card-${chapter.id}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
                         <div className="w-8 h-8 bg-secondary-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -273,7 +354,7 @@ export default function Chapters() {
                           placeholder={`第${index + 1}章のタイトル`}
                           value={chapter.title}
                           onChange={(e) => updateChapter(index, { title: e.target.value })}
-                          data-testid={`input-chapter-title-${index}`}
+                          data-testid={`input-chapter-title-${chapter.id}`}
                           className="font-medium flex-1"
                         />
                       </div>
@@ -285,7 +366,8 @@ export default function Chapters() {
                           variant="ghost"
                           size="sm"
                           onClick={() => removeChapter(index)}
-                          data-testid={`button-remove-chapter-${index}`}
+                          data-testid={`button-remove-chapter-${chapter.id}`}
+                          disabled={deleteChapterMutation.isPending}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -297,7 +379,7 @@ export default function Chapters() {
                         placeholder="章の概要・あらすじ"
                         value={chapter.summary || ""}
                         onChange={(e) => updateChapter(index, { summary: e.target.value })}
-                        data-testid={`textarea-chapter-summary-${index}`}
+                        data-testid={`textarea-chapter-summary-${chapter.id}`}
                         rows={3}
                         className="resize-none"
                       />
@@ -310,7 +392,7 @@ export default function Chapters() {
                             placeholder="5000"
                             value={chapter.estimatedWords || ""}
                             onChange={(e) => updateChapter(index, { estimatedWords: parseInt(e.target.value) || 0 })}
-                            data-testid={`input-chapter-words-${index}`}
+                            data-testid={`input-chapter-words-${chapter.id}`}
                             className="text-sm"
                           />
                         </div>
@@ -321,7 +403,7 @@ export default function Chapters() {
                             placeholder="20"
                             value={chapter.estimatedReadingTime || ""}
                             onChange={(e) => updateChapter(index, { estimatedReadingTime: parseInt(e.target.value) || 0 })}
-                            data-testid={`input-chapter-time-${index}`}
+                            data-testid={`input-chapter-time-${chapter.id}`}
                             className="text-sm"
                           />
                         </div>
@@ -340,7 +422,7 @@ export default function Chapters() {
                             }
                           }}
                         >
-                          <SelectTrigger className="text-sm" data-testid={`select-chapter-characters-${index}`}>
+                          <SelectTrigger className="text-sm" data-testid={`select-chapter-characters-${chapter.id}`}>
                             <SelectValue placeholder="キャラクターを追加" />
                           </SelectTrigger>
                           <SelectContent>
