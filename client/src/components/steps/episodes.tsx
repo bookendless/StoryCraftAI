@@ -485,7 +485,7 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
   const [newEvent, setNewEvent] = useState("");
 
   const addEvent = () => {
-    if (newEvent.trim()) {
+    if (newEvent.trim() && episode) {
       const events = Array.isArray(episode.events) ? episode.events : [];
       onChange({ 
         ...episode, 
@@ -496,11 +496,13 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
   };
 
   const removeEvent = (index: number) => {
-    const events = Array.isArray(episode.events) ? episode.events : [];
-    onChange({ 
-      ...episode, 
-      events: events.filter((_: any, i: number) => i !== index) 
-    });
+    if (episode) {
+      const events = Array.isArray(episode.events) ? episode.events : [];
+      onChange({ 
+        ...episode, 
+        events: events.filter((_: any, i: number) => i !== index) 
+      });
+    }
   };
 
   return (
@@ -516,8 +518,8 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
               id="title"
               data-testid="input-episode-title"
               placeholder="例: 運命的な出会い"
-              value={episode.title}
-              onChange={(e) => onChange({ ...episode, title: e.target.value })}
+              value={episode?.title || ""}
+              onChange={(e) => episode && onChange({ ...episode, title: e.target.value })}
             />
           </div>
           <div className="space-y-2">
@@ -526,8 +528,8 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
               id="perspective"
               data-testid="input-episode-perspective"
               placeholder="例: アリス"
-              value={episode.perspective || ""}
-              onChange={(e) => onChange({ ...episode, perspective: e.target.value })}
+              value={episode?.perspective || ""}
+              onChange={(e) => episode && onChange({ ...episode, perspective: e.target.value })}
             />
           </div>
         </div>
@@ -538,8 +540,8 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
             id="description"
             data-testid="textarea-episode-description"
             placeholder="このエピソードで何が起こるかを記述..."
-            value={episode.description || ""}
-            onChange={(e) => onChange({ ...episode, description: e.target.value })}
+            value={episode?.description || ""}
+            onChange={(e) => episode && onChange({ ...episode, description: e.target.value })}
             rows={3}
           />
         </div>
@@ -550,8 +552,8 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
             id="setting"
             data-testid="textarea-episode-setting"
             placeholder="場所、時間、環境の描写..."
-            value={episode.setting || ""}
-            onChange={(e) => onChange({ ...episode, setting: e.target.value })}
+            value={episode?.setting || ""}
+            onChange={(e) => episode && onChange({ ...episode, setting: e.target.value })}
             rows={2}
           />
         </div>
@@ -560,8 +562,8 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
           <div className="space-y-2">
             <Label htmlFor="mood">雰囲気・トーン</Label>
             <Select 
-              value={episode.mood || ""} 
-              onValueChange={(value) => onChange({ ...episode, mood: value })}
+              value={episode?.mood || ""} 
+              onValueChange={(value) => episode && onChange({ ...episode, mood: value })}
             >
               <SelectTrigger data-testid="select-episode-mood">
                 <SelectValue placeholder="雰囲気を選択" />
@@ -584,8 +586,8 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
               id="dialogue"
               data-testid="textarea-episode-dialogue"
               placeholder="キーとなる会話やセリフ..."
-              value={episode.dialogue || ""}
-              onChange={(e) => onChange({ ...episode, dialogue: e.target.value })}
+              value={episode?.dialogue || ""}
+              onChange={(e) => episode && onChange({ ...episode, dialogue: e.target.value })}
               rows={2}
             />
           </div>
@@ -611,9 +613,9 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
                 追加
               </Button>
             </div>
-            {episode.events && episode.events.length > 0 && (
+            {episode?.events && episode.events.length > 0 && (
               <div className="border rounded-lg p-3 max-h-32 overflow-y-auto">
-                {episode.events.map((event: string, index: number) => (
+                {episode?.events?.map((event: string, index: number) => (
                   <div key={index} className="flex items-center justify-between py-1">
                     <span className="text-sm" data-testid={`text-event-${index}`}>{event}</span>
                     <Button

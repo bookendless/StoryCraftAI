@@ -130,8 +130,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         3
       );
 
-      res.json(suggestions);
+      // Save generated characters to storage
+      const savedCharacters = [];
+      for (const suggestion of suggestions) {
+        const characterData = {
+          projectId: req.params.projectId,
+          name: suggestion.name,
+          description: suggestion.description,
+          role: suggestion.role,
+          personality: suggestion.personality,
+          background: suggestion.background,
+          motivation: suggestion.motivation,
+          arc: suggestion.arc,
+          affiliations: suggestion.affiliations || []
+        };
+        const savedCharacter = await storage.createCharacter(characterData);
+        savedCharacters.push(savedCharacter);
+      }
+
+      res.json(savedCharacters);
     } catch (error) {
+      console.error("Character generation error:", error);
       res.status(500).json({ message: getErrorMessage(error) });
     }
   });

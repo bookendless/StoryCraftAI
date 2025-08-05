@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Sparkles, Save } from "lucide-react";
+import { FileText, Sparkles, Save, History } from "lucide-react";
+import { SynopsisHistory } from "./synopsis-history";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Synopsis } from "@shared/schema";
@@ -22,6 +23,7 @@ export default function Synopsis({ projectId }: SynopsisProps) {
     tone: "",
     style: ""
   });
+  const [showHistory, setShowHistory] = useState(false);
 
   const { data: synopsis, isLoading } = useQuery<Synopsis>({
     queryKey: ["/api/projects", projectId, "synopsis"],
@@ -140,9 +142,20 @@ export default function Synopsis({ projectId }: SynopsisProps) {
           {/* Synopsis Editor */}
           <Card className="elevation-1">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="w-5 h-5 icon-default" />
-                <span>あらすじ</span>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <FileText className="w-5 h-5 icon-default" />
+                  <span>あらすじ</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowHistory(true)}
+                  data-testid="button-synopsis-history"
+                >
+                  <History className="w-4 h-4 mr-2" />
+                  履歴
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -261,6 +274,14 @@ export default function Synopsis({ projectId }: SynopsisProps) {
           )}
         </div>
       </div>
+
+      {/* Synopsis History Dialog */}
+      <SynopsisHistory
+        projectId={projectId}
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
+        onRestore={(content) => setSynopsisData({ ...synopsisData, content })}
+      />
     </div>
   );
 }

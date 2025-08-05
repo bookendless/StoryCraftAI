@@ -2,7 +2,15 @@
 
 ## Overview
 
-This is a Japanese novel/story writing application that provides AI-assisted creative writing tools. The system guides users through a structured 6-step writing process: character development, plot creation, synopsis writing, chapter planning, episode design, and draft generation. Built as a full-stack TypeScript application with a React frontend and Express backend, it integrates OpenAI's GPT models to provide intelligent writing suggestions and content generation at each step of the creative process.
+This is a Japanese novel/story writing application that provides AI-assisted creative writing tools. The system guides users through a structured 6-step writing process: character development, plot creation, synopsis writing, chapter planning, episode design, and draft generation. Built as a full-stack TypeScript application with a React frontend and Express backend, it integrates Google's Gemini AI models to provide intelligent writing suggestions and content generation at each step of the creative process.
+
+## Recent Changes (January 2025)
+
+- **AI Migration**: Migrated all AI functions from OpenAI to Gemini API with support for models: gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash, gemini-1.5-flash
+- **Bug Fixes**: Resolved critical issues including episode cancellation crashes, chapters scrolling problems, and character generation not saving properly
+- **Version History**: Added synopsis version history system to prevent AI overwrites and allow users to restore previous versions
+- **UI Updates**: Updated settings dialog to show new Gemini models, maintained #1b6e98 button text color throughout interface
+- **Null Safety**: Added proper null checking throughout episode and chapter components to prevent runtime errors
 
 ## User Preferences
 
@@ -38,9 +46,9 @@ Preferred communication style: Simple, everyday language.
 ### External Dependencies
 
 #### AI Integration
-- **Gemini API**: Google's latest AI models (gemini-1.5-flash, gemini-2.0-flash, gemini-2.5-flash, gemini-2.5-pro) for content generation including character suggestions, plot development, synopsis creation, chapter planning, episode design, and draft writing
-- **OpenAI API**: Backup GPT-4 integration available
+- **Gemini API**: Google's latest AI models (gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash, gemini-1.5-flash) for content generation including character suggestions, plot development, synopsis creation, chapter planning, episode design, and draft writing
 - **Content Generation**: Structured prompts in Japanese for culturally appropriate content creation
+- **AI Character Generation**: Now properly saves generated characters to database instead of just displaying suggestions
 
 #### Database and Infrastructure
 - **Neon Database**: Serverless PostgreSQL hosting with connection pooling

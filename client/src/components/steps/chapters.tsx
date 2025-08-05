@@ -225,7 +225,8 @@ export default function Chapters({ projectId }: ChaptersProps) {
         </header>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-6 overflow-y-auto min-h-0">
+        <div className="flex-1 p-6 min-h-0">
+          <div className="h-full overflow-y-auto">
           {/* Chapter Overview */}
           <div className="bg-surface-50 rounded-xl p-6 mb-6 elevation-1">
             <h3 className="text-lg font-medium text-on-surface mb-4">全体構成概要</h3>
@@ -492,24 +493,23 @@ export default function Chapters({ projectId }: ChaptersProps) {
         )}
 
         {/* AI Suggestions */}
-        <div className="bg-primary-50 rounded-lg p-4">
-          <h4 className="font-medium text-primary-700 mb-3">AI提案</h4>
-          <div className="space-y-3 text-sm">
-            <div className="bg-white rounded-lg p-3">
-              <p className="text-secondary-600 mb-2">💡 章構成のバランスを改善する提案を生成できます。</p>
-              <Button 
-                size="sm"
-                onClick={() => generateChaptersMutation.mutate()}
-                disabled={generateChaptersMutation.isPending}
-                data-testid="button-ai-improve-structure"
-                className="bg-primary-500 hover:bg-primary-600 text-white"
-              >
-                構成改善案を生成
-              </Button>
-            </div>
-          </div>
+        <div className="bg-surface-100 rounded-lg p-4">
+          <h4 className="font-medium text-on-surface mb-3">AI提案</h4>
+          <p className="text-sm text-secondary-500 mb-3">
+            章構成を自動生成してより良い物語構造を作成できます。
+          </p>
+          <Button
+            onClick={() => generateChaptersMutation.mutate()}
+            disabled={generateChaptersMutation.isPending}
+            className="w-full bg-primary-500 hover:bg-primary-600 text-white"
+            data-testid="button-ai-generate-suggestions"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            {generateChaptersMutation.isPending ? "生成中..." : "AI提案を取得"}
+          </Button>
         </div>
       </div>
+    </div>
 
       {/* Edit Chapter Dialog */}
       {editingChapter && (

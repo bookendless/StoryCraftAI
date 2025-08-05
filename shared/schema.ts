@@ -49,6 +49,15 @@ export const synopses = pgTable("synopses", {
   style: text("style"),
 });
 
+export const synopsisVersions = pgTable("synopsis_versions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  version: integer("version").notNull(),
+  isActive: boolean("is_active").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 export const chapters = pgTable("chapters", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
@@ -126,6 +135,13 @@ export type InsertPlot = z.infer<typeof insertPlotSchema>;
 
 export type Synopsis = typeof synopses.$inferSelect;
 export type InsertSynopsis = z.infer<typeof insertSynopsisSchema>;
+
+export type SynopsisVersion = typeof synopsisVersions.$inferSelect;
+export const insertSynopsisVersionSchema = createInsertSchema(synopsisVersions).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertSynopsisVersion = z.infer<typeof insertSynopsisVersionSchema>;
 
 export type Chapter = typeof chapters.$inferSelect;
 export type InsertChapter = z.infer<typeof insertChapterSchema>;
