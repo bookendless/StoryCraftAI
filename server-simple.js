@@ -69,6 +69,21 @@ app.put('/api/projects/:id', (req, res) => {
   res.json(projects[index]);
 });
 
+// プロジェクトの部分更新（PATCH）
+app.patch('/api/projects/:id', (req, res) => {
+  const index = projects.findIndex(p => p.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Project not found' });
+  }
+  projects[index] = {
+    ...projects[index],
+    ...req.body,
+    updatedAt: new Date().toISOString()
+  };
+  console.log('Project patched:', projects[index].id, 'with', req.body);
+  res.json(projects[index]);
+});
+
 app.delete('/api/projects/:id', (req, res) => {
   const index = projects.findIndex(p => p.id === req.params.id);
   if (index === -1) {
@@ -116,6 +131,32 @@ app.put('/api/projects/:projectId/characters/:id', (req, res) => {
   res.json(characters[index]);
 });
 
+// キャラクターの部分更新（PATCH）
+app.patch('/api/projects/:projectId/characters/:id', (req, res) => {
+  const index = characters.findIndex(c => c.id === req.params.id && c.projectId === req.params.projectId);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Character not found' });
+  }
+  characters[index] = {
+    ...characters[index],
+    ...req.body,
+    updatedAt: new Date().toISOString()
+  };
+  console.log('Character patched:', characters[index].id);
+  res.json(characters[index]);
+});
+
+// 削除機能
+app.delete('/api/projects/:projectId/characters/:id', (req, res) => {
+  const index = characters.findIndex(c => c.id === req.params.id && c.projectId === req.params.projectId);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Character not found' });
+  }
+  characters.splice(index, 1);
+  console.log('Character deleted:', req.params.id);
+  res.status(204).send();
+});
+
 // プロット管理
 let plots = [];
 
@@ -156,7 +197,22 @@ app.post('/api/projects/:projectId/synopses', (req, res) => {
   res.status(201).json(newSynopsis);
 });
 
-// 画像アップロード用のエンドポイント（本格実装）
+// オブジェクトストレージ用エンドポイント（ローカル開発用）
+app.post('/api/objects/upload', (req, res) => {
+  console.log('POST /api/objects/upload - object storage upload requested');
+  
+  // プリサインURLをシミュレート
+  const uploadId = Date.now();
+  const uploadURL = `https://picsum.photos/400/300?random=${uploadId}`;
+  
+  console.log('Generated upload URL:', uploadURL);
+  res.json({ 
+    uploadURL: uploadURL,
+    message: 'Upload URL generated (local development mode)'
+  });
+});
+
+// 画像アップロード用のエンドポイント（従来互換）
 app.post('/api/upload', (req, res) => {
   console.log('POST /api/upload - image upload requested');
   

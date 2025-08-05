@@ -61,7 +61,7 @@ export default function Characters({ projectId }: CharactersProps) {
 
   const updateCharacterMutation = useMutation({
     mutationFn: async ({ id, ...character }: Partial<Character> & { id: string }) => {
-      const response = await apiRequest("PATCH", `/api/characters/${id}`, character);
+      const response = await apiRequest("PATCH", `/api/projects/${projectId}/characters/${id}`, character);
       return response.json();
     },
     onSuccess: () => {
@@ -83,7 +83,7 @@ export default function Characters({ projectId }: CharactersProps) {
 
   const deleteCharacterMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/characters/${id}`);
+      await apiRequest("DELETE", `/api/projects/${projectId}/characters/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "characters"] });
@@ -103,14 +103,30 @@ export default function Characters({ projectId }: CharactersProps) {
 
   const generateCharactersMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", `/api/projects/${projectId}/characters/generate`);
+      const response = await apiRequest("POST", `/api/ai/generate-character`, {
+        prompt: `プロジェクト用のキャラクターを生成してください`
+      });
       return response.json();
     },
-    onSuccess: (suggestions) => {
-      // AI提案を表示するダイアログなどを実装
+    onSuccess: (data) => {
+      // AI生成キャラクターを新規キャラクターフォームに設定
+      if (data.character) {
+        setNewCharacter({
+          ...newCharacter,
+          name: data.character.name || "",
+          description: data.character.personality || "",
+          personality: data.character.personality || "",
+          background: data.character.background || "",
+          role: data.character.occupation || "",
+          affiliation: "",
+          imageUrl: "",
+          order: characters.length
+        });
+        setDialogOpen(true); // ダイアログを開いて確認・編集できるようにする
+      }
       toast({
         title: "AI提案完了",
-        description: `${suggestions.length}個のキャラクター案を生成しました。`,
+        description: data.message || "キャラクター案を生成しました。",
       });
     },
     onError: () => {

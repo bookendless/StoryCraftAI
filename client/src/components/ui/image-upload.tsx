@@ -40,7 +40,7 @@ export function ImageUpload({ imageUrl, onImageChange, placeholder = "画像を�
     setIsUploading(true);
 
     try {
-      // プリサインURLを取得
+      // ローカル開発用：簡易画像アップロード処理
       const uploadResponse = await fetch('/api/objects/upload', {
         method: 'POST',
         headers: {
@@ -54,33 +54,9 @@ export function ImageUpload({ imageUrl, onImageChange, placeholder = "画像を�
 
       const { uploadURL } = await uploadResponse.json();
 
-      // ファイルをアップロード
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const uploadFileResponse = await fetch(uploadURL, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
-
-      if (!uploadFileResponse.ok) {
-        throw new Error('ファイルのアップロードに失敗しました');
-      }
-
-      // アップロードされた画像のパスを正しく設定
-      const url = new URL(uploadURL);
-      const pathParts = url.pathname.split('/');
-      
-      // パスから uploads/ を取得して、objects パスに変換
-      const objectName = pathParts.slice(2).join('/'); // バケット名を除く
-      
-      // オブジェクトストレージのパス形式に変換
-      const objectPath = `/objects/${objectName}`;
-      
-      onImageChange(objectPath);
+      // ローカル開発：実際のファイルアップロードの代わりに
+      // プリサインURLをそのまま画像URLとして使用
+      onImageChange(uploadURL);
 
       toast({
         title: "成功",
