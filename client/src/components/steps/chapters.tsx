@@ -230,7 +230,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
           <div className="bg-surface-50 rounded-xl p-6 mb-6 elevation-1">
             <h3 className="text-lg font-medium text-on-surface mb-4">全体構成概要</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="rounded-lg p-4 bg-[#fdf0f0]">
+              <div className="bg-primary-50 rounded-lg p-4">
                 <h4 className="font-medium text-primary-700 mb-2">起</h4>
                 <p className="text-sm text-muted-foreground">主人公の日常と事件の発端</p>
                 <div className="text-xs text-primary-600 mt-2">
@@ -354,26 +354,24 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           size="sm"
                           onClick={() => setEditingChapter(chapter)}
                           data-testid={`button-edit-chapter-${chapter.id}`}
-                          className="button-enhanced"
                         >
-                          <Edit className="w-4 h-4 icon-action-colorful" />
+                          <Edit className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           data-testid={`button-drag-chapter-${chapter.id}`}
-                          className="button-subtle"
                         >
-                          <GripVertical className="w-4 h-4 icon-action-colorful" />
+                          <GripVertical className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => deleteChapterMutation.mutate(chapter.id)}
                           data-testid={`button-delete-chapter-${chapter.id}`}
-                          className="text-destructive hover:text-destructive button-action"
+                          className="text-destructive hover:text-destructive"
                         >
-                          <Trash2 className="w-4 h-4 icon-action-colorful" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
@@ -397,7 +395,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                         </Badge>
                         {chapter.characterIds && Array.isArray(chapter.characterIds) && chapter.characterIds.length > 0 && (
                           <Badge variant="outline" data-testid={`badge-chapter-characters-${chapter.id}`}>
-                            {String(chapter.characterIds.length)}名登場
+                            {chapter.characterIds.length}名登場
                           </Badge>
                         )}
                       </div>
@@ -436,6 +434,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
           )}
         </div>
       </div>
+
       {/* Preview Panel */}
       <div className="w-80 bg-surface-50 border-l border-outline/10 p-6 overflow-y-auto custom-scrollbar">
         <h3 className="text-lg font-medium text-on-surface mb-4">構成プレビュー</h3>
@@ -511,6 +510,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
           </div>
         </div>
       </div>
+
       {/* Edit Chapter Dialog */}
       {editingChapter && (
         <Dialog open={!!editingChapter} onOpenChange={() => setEditingChapter(null)}>

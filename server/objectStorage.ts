@@ -156,24 +156,14 @@ export class ObjectStorageService {
 
     const entityId = parts.slice(1).join("/");
     let entityDir = this.getPrivateObjectDir();
-    
     if (!entityDir.endsWith("/")) {
       entityDir = `${entityDir}/`;
     }
-    
-    // entityIdが既に.private/uploads/で始まる場合は、そのまま使用
-    let objectEntityPath;
-    if (entityId.startsWith('.private/uploads/')) {
-      objectEntityPath = `/${process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID}/${entityId}`;
-    } else {
-      objectEntityPath = `${entityDir}${entityId}`;
-    }
-    
+    const objectEntityPath = `${entityDir}${entityId}`;
     const { bucketName, objectName } = parseObjectPath(objectEntityPath);
     const bucket = objectStorageClient.bucket(bucketName);
     const objectFile = bucket.file(objectName);
     const [exists] = await objectFile.exists();
-    
     if (!exists) {
       throw new ObjectNotFoundError();
     }

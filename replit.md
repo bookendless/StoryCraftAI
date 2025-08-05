@@ -7,45 +7,6 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
-Communication language: Japanese
-
-## EXE Build Process
-
-The application is fully configured for creating Windows EXE files using Electron and Electron Builder. All necessary configuration files are in place:
-
-### Configuration Files:
-- `electron/main.js`: Main Electron process with Japanese menu system
-- `electron-builder.json`: Build configuration for Windows, macOS, and Linux
-- `build-electron.sh`: Automated build script
-
-### Build Instructions:
-1. For local development: See `LOCAL_SETUP_GUIDE.md`
-2. For EXE build: See `EXE_BUILD_INSTRUCTIONS.md` and `PACKAGE_JSON_TEMPLATE.md`
-3. The app includes a full Japanese interface with native menu system
-
-### Known Issues:
-- Replit environment cannot build EXE files due to Electron limitations
-- Local environment requires package.json modifications for proper ES Module handling
-- Current electron/main.js has been updated to support ES Module imports
-
-### Recent Fixes (2025-08-05):
-- ✅ 画像表示エラー修正完了（Base64フォールバック機能追加）
-- ✅ サイドバーナビゲーション機能修復完了
-- ✅ 右画面スクロール問題修正完了
-- ✅ プロット・あらすじ・章立て保存機能動作確認
-- ✅ エクスポート機能実装完了
-- ✅ LSPエラー修正（型安全性向上）
-- ✅ キャンセルボタンエラー修正完了
-- ✅ MemStorageによるデータ永続化確保
-- ✅ Base64画像アップロード機能完全動作
-
-### Final Completion (2025-08-05):
-- ✅ ローカルファイル永続化システム実装完了（local-data/story-projects.json）
-- ✅ Express 50MB制限対応（画像アップロード問題解決）
-- ✅ 自動保存・手動保存・詳細エクスポート機能実装
-- ✅ サーバー再起動後のデータ完全復元確認
-- ✅ 全主要機能のローカル環境動作確認完了
-- ✅ EXE生成準備完了（ローカル実行基盤確立）
 
 ## System Architecture
 
@@ -100,5 +61,3 @@ The application is fully configured for creating Windows EXE files using Electro
 - **Vite**: Fast development server and build tool with React plugin
 - **PostCSS**: CSS processing with Tailwind and Autoprefixer
 - **ESModules**: Native ES module support throughout the application
-- **Electron**: Desktop application framework for creating native EXE files
-- **Electron Builder**: Build tool for packaging the app into distributable formats

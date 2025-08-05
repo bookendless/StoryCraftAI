@@ -1,10 +1,6 @@
-import { app, BrowserWindow, Menu, dialog } from 'electron';
-import path from 'path';
-import { spawn } from 'child_process';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { app, BrowserWindow, Menu, dialog } = require('electron');
+const path = require('path');
+const { spawn } = require('child_process');
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
@@ -105,14 +101,11 @@ function createWindow() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 
-  // 開発環境では直接localhost:5000に接続
-  // 本番環境では、ビルドされたファイルをロード
-  if (isDev || process.env.NODE_ENV === 'development') {
-    // 開発サーバーが起動するまで少し待機
-    setTimeout(() => {
-      mainWindow.loadURL('http://localhost:5000');
-    }, 2000);
+  if (isDev) {
+    // 開発環境では、Viteサーバーに接続
+    startDevServer();
   } else {
+    // 本番環境では、ビルドされたファイルをロード
     mainWindow.loadFile(path.join(__dirname, '../client/dist/index.html'));
   }
 
@@ -128,7 +121,18 @@ function createWindow() {
   });
 }
 
-// この関数は不要になったため削除
+function startDevServer() {
+  // サーバーを起動
+  serverProcess = spawn('npm', ['run', 'dev'], {
+    cwd: path.join(__dirname, '..'),
+    stdio: 'inherit'
+  });
+
+  // サーバーが起動するまで待機してからロード
+  setTimeout(() => {
+    mainWindow.loadURL('http://localhost:5000');
+  }, 3000);
+}
 
 app.whenReady().then(createWindow);
 

@@ -180,7 +180,7 @@ export default function Home() {
                 <DialogTrigger asChild>
                   <Button 
                     data-testid="button-create-project"
-                    className="hover:bg-primary-600 text-white elevation-2 bg-[#f2f1ed]"
+                    className="bg-primary-500 hover:bg-primary-600 text-white elevation-2"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     新しいプロジェクト
@@ -423,7 +423,7 @@ export default function Home() {
                             data-testid={`button-project-menu-${project.id}`}
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <MoreVertical className="h-4 w-4 icon-button-colorful" />
+                            <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -434,7 +434,7 @@ export default function Home() {
                             }}
                             data-testid={`button-edit-project-${project.id}`}
                           >
-                            <Edit className="h-4 w-4 mr-2 icon-action-colorful" />
+                            <Edit className="h-4 w-4 mr-2" />
                             編集
                           </DropdownMenuItem>
                           <AlertDialog>
@@ -444,7 +444,7 @@ export default function Home() {
                                 className="text-destructive focus:text-destructive"
                                 data-testid={`button-delete-project-${project.id}`}
                               >
-                                <Trash2 className="h-4 w-4 mr-2 icon-action-colorful" />
+                                <Trash2 className="h-4 w-4 mr-2" />
                                 削除
                               </DropdownMenuItem>
                             </AlertDialogTrigger>

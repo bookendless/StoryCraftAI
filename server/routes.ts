@@ -17,51 +17,6 @@ function getErrorMessage(error: unknown): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
-  // 手動保存エンドポイント
-  app.post("/api/save", async (req, res) => {
-    try {
-      // MemStorageは自動保存されているが、手動保存要求への応答
-      res.json({ 
-        success: true, 
-        message: "データは自動的に保存されています",
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      res.status(500).json({ error: "保存エラー" });
-    }
-  });
-
-  // プロジェクトエクスポート（詳細データ付き）
-  app.get("/api/projects/:id/export", async (req, res) => {
-    try {
-      const projectId = req.params.id;
-      const project = await storage.getProject(projectId);
-      if (!project) {
-        return res.status(404).json({ error: "プロジェクトが見つかりません" });
-      }
-
-      const characters = await storage.getCharacters(projectId);
-      const plot = await storage.getPlot(projectId);
-      const synopsis = await storage.getSynopsis(projectId);
-      const chapters = await storage.getChapters(projectId);
-
-      const exportData = {
-        project,
-        characters,
-        plot,
-        synopsis,
-        chapters,
-        exportDate: new Date().toISOString(),
-        version: "1.0"
-      };
-
-      res.json(exportData);
-    } catch (error) {
-      console.error("Export error:", error);
-      res.status(500).json({ error: "エクスポートエラー" });
-    }
-  });
   // Projects
   app.get("/api/projects", async (req, res) => {
     try {
@@ -493,46 +448,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Private object serving (development mode - simplified)
+  // Private object serving
   app.get("/objects/:objectPath(*)", async (req, res) => {
-    console.log('GET /objects/* - serving object at path:', req.path);
     try {
-      // 開発モード：パスから画像IDを抽出してLorem Picsumにリダイレクト
-      const pathParts = req.path.split('/');
-      const fileName = pathParts[pathParts.length - 1];
-      const imageId = fileName.split('?')[0].replace(/\D/g, '') || Date.now();
-      const imageUrl = `https://picsum.photos/400/300?random=${imageId}`;
-      console.log('Redirecting to:', imageUrl);
-      res.redirect(imageUrl);
+      const objectFile = await objectStorageService.getObjectEntityFile(
+        req.path,
+      );
+      objectStorageService.downloadObject(objectFile, res);
     } catch (error) {
-      console.error("Error serving object:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 
-  // Get upload URL (development mode - simplified)
+  // Get upload URL
   app.post("/api/objects/upload", async (req, res) => {
     try {
-      // 開発モード：Lorem Picsumから画像URLを生成
-      const uploadId = Date.now();
-      const uploadURL = `https://picsum.photos/400/300?random=${uploadId}`;
-      console.log('Generated upload URL:', uploadURL);
-      res.json({ 
-        uploadURL: uploadURL,
-        message: 'Upload URL generated (development mode)'
-      });
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
     } catch (error) {
       console.error("Error getting upload URL:", error);
       res.status(500).json({ error: "Failed to get upload URL" });
     }
-  });
-
-  // 画像表示用エンドポイント（プロキシ機能）
-  app.get('/api/images/:imageId', (req, res) => {
-    const imageId = req.params.imageId;
-    const imageUrl = `https://picsum.photos/400/300?random=${imageId}`;
-    console.log('GET /api/images/:imageId - redirecting to:', imageUrl);
-    res.redirect(imageUrl);
   });
 
   const httpServer = createServer(app);

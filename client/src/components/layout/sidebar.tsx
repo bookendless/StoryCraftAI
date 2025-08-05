@@ -11,7 +11,6 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { SettingsDialog } from "@/components/settings/settings-dialog";
-import { SaveButton } from "@/components/ui/save-button";
 import type { Project } from "@shared/schema";
 
 interface SidebarProps {
@@ -53,52 +52,8 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
   });
 
   const handleStepClick = (stepId: number) => {
-    console.log(`[Sidebar] ステップクリック: ${stepId}, 現在のステップ: ${project.currentStep}`);
     if (stepId <= project.currentStep || stepId === project.currentStep + 1) {
-      console.log(`[Sidebar] ステップ更新を実行: ${stepId}`);
       updateStepMutation.mutate(stepId);
-    } else {
-      console.log(`[Sidebar] ステップ更新をスキップ（条件不一致）`);
-    }
-  };
-
-  const handleExport = async () => {
-    try {
-      toast({
-        title: "エクスポート開始",
-        description: "プロジェクトデータを準備しています...",
-      });
-
-      // プロジェクトデータを収集
-      const projectData = {
-        project,
-        exportDate: new Date().toISOString(),
-        version: "1.0"
-      };
-
-      // JSON形式でダウンロード
-      const blob = new Blob([JSON.stringify(projectData, null, 2)], {
-        type: "application/json"
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${project.title}_export_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: "エクスポート完了",
-        description: "プロジェクトデータをダウンロードしました。",
-      });
-    } catch (error) {
-      toast({
-        title: "エクスポートエラー",
-        description: "プロジェクトのエクスポートに失敗しました。",
-        variant: "destructive",
-      });
     }
   };
 
@@ -116,7 +71,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
     if (status === "active") {
       return <Edit className="w-4 h-4 text-white" />;
     }
-    return <IconComponent className="w-4 h-4 icon-menu-colorful" />;
+    return <IconComponent className="w-4 h-4 text-foreground" />;
   };
 
   return (
@@ -130,7 +85,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 from-primary-500 to-primary-700 rounded-lg flex items-center justify-center bg-[#3bc7d1]">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -144,18 +99,19 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
             size="sm"
             onClick={onToggle}
             data-testid="button-toggle-sidebar"
-            className="p-1 rounded-lg material-transition button-subtle"
+            className="p-2 rounded-lg hover:bg-surface-200 material-transition"
           >
-            <Menu className="w-5 h-5 icon-colorful" />
+            <Menu className="w-5 h-5 icon-default" />
           </Button>
         </div>
       </div>
+
       {/* Project Info */}
       {!collapsed && (
         <div className="p-6 border-b border-outline/10">
           <div className="bg-primary-50 rounded-xl p-4">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-12 h-16 from-primary-500 to-primary-700 rounded-lg flex items-center justify-center bg-[#3bc7d1] ml-[0px] mr-[0px] pt-[0px] pb-[0px]">
+              <div className="w-12 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
@@ -184,6 +140,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           </div>
         </div>
       )}
+
       {/* Step Navigation */}
       <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
         {!collapsed && (
@@ -234,17 +191,18 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
                 )}
                 
                 {!collapsed && status === "completed" && (
-                  <Check className="w-4 h-4 icon-action-colorful" />
+                  <Check className="w-4 h-4 text-green-500" />
                 )}
                 
                 {!collapsed && status === "active" && (
-                  <Edit className="w-4 h-4 icon-action-colorful" />
+                  <Edit className="w-4 h-4 text-primary-500" />
                 )}
               </button>
             );
           })}
         </nav>
       </div>
+
       {/* Back to Home and Export Section */}
       <div className="p-6 border-t border-outline/10 space-y-3">
         <div className="flex items-center justify-between">
@@ -252,9 +210,9 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
             variant="outline"
             onClick={() => setLocation("/")}
             data-testid="button-back-home"
-            className={`button-enhanced ${collapsed ? "w-full" : "flex-1 mr-2"}`}
+            className={`${collapsed ? "w-full" : "flex-1 mr-2"}`}
           >
-            <Home className="w-4 h-4 icon-button-colorful" />
+            <Home className="w-4 h-4" />
             {!collapsed && <span className="ml-2">ホームに戻る</span>}
           </Button>
           
@@ -263,26 +221,14 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           )}
         </div>
         
-        {!collapsed && (
-          <div className="space-y-2">
-            <SaveButton variant="save" className="w-full" />
-            <SaveButton 
-              variant="export" 
-              projectId={project.id} 
-              className="w-full button-subtle" 
-            />
-          </div>
-        )}
-        
         <Button 
           className={`w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 material-transition elevation-1 ${
             collapsed ? "px-3" : ""
           }`}
-          onClick={() => handleExport()}
-          data-testid="button-export-simple"
+          data-testid="button-export"
         >
-          <Download className="w-4 h-4 icon-button-colorful" />
-          {!collapsed && <span className="ml-2">基本エクスポート</span>}
+          <Download className="w-4 h-4" />
+          {!collapsed && <span className="ml-2">エクスポート</span>}
         </Button>
         
         {collapsed && (

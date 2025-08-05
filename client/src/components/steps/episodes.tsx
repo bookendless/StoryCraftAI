@@ -360,26 +360,24 @@ export default function Episodes({ projectId }: EpisodesProps) {
                               size="sm"
                               onClick={() => setEditingEpisode(episode)}
                               data-testid={`button-edit-episode-${episode.id}`}
-                              className="button-enhanced"
                             >
-                              <Edit className="w-4 h-4 icon-action-colorful" />
+                              <Edit className="w-4 h-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               data-testid={`button-drag-episode-${episode.id}`}
-                              className="button-subtle"
                             >
-                              <GripVertical className="w-4 h-4 icon-action-colorful" />
+                              <GripVertical className="w-4 h-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => deleteEpisodeMutation.mutate(episode.id)}
                               data-testid={`button-delete-episode-${episode.id}`}
-                              className="text-destructive hover:text-destructive button-action"
+                              className="text-destructive hover:text-destructive"
                             >
-                              <Trash2 className="w-4 h-4 icon-action-colorful" />
+                              <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
                         </div>
@@ -411,7 +409,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
                               {(episode.events as string[]).map((event, idx) => (
                                 <li key={idx} className="flex items-start space-x-2">
                                   <span className="text-primary-500 mt-1">•</span>
-                                  <span>{String(event)}</span>
+                                  <span>{event}</span>
                                 </li>
                               ))}
                             </ul>
