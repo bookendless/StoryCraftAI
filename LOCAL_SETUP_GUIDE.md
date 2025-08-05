@@ -55,7 +55,15 @@ start-windows-simple.bat
 start-direct.bat
 
 # 3. サーバーが起動したら、別のコマンドプロンプトでElectronを起動
+
+# 通常起動
 npx electron electron/main-simple.js
+
+# デバッグモード（エラーログ付き）
+start-electron.bat
+
+# または手動でデバッグ版を起動
+npx electron electron/main-debug.js
 ```
 
 **バッチファイルが失敗する場合の代替手順:**
