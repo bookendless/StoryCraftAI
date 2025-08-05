@@ -24,13 +24,80 @@ if (fs.existsSync(distPath)) {
 }
 app.use(express.json());
 
+// データベース接続（環境変数から）
+const DATABASE_URL = process.env.DATABASE_URL;
+let projects = []; // メモリ内ストレージ（簡易実装）
+
 // 基本的なAPIエンドポイント
 app.get('/api/projects', (req, res) => {
-  res.json([]);
+  console.log('GET /api/projects - returning', projects.length, 'projects');
+  res.json(projects);
+});
+
+app.post('/api/projects', (req, res) => {
+  console.log('POST /api/projects - creating project:', req.body);
+  const newProject = {
+    id: Date.now().toString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...req.body
+  };
+  projects.push(newProject);
+  console.log('Project created with ID:', newProject.id);
+  res.status(201).json(newProject);
+});
+
+app.get('/api/projects/:id', (req, res) => {
+  const project = projects.find(p => p.id === req.params.id);
+  if (!project) {
+    return res.status(404).json({ error: 'Project not found' });
+  }
+  res.json(project);
+});
+
+app.put('/api/projects/:id', (req, res) => {
+  const index = projects.findIndex(p => p.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Project not found' });
+  }
+  projects[index] = {
+    ...projects[index],
+    ...req.body,
+    updatedAt: new Date().toISOString()
+  };
+  console.log('Project updated:', projects[index].id);
+  res.json(projects[index]);
+});
+
+app.delete('/api/projects/:id', (req, res) => {
+  const index = projects.findIndex(p => p.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Project not found' });
+  }
+  projects.splice(index, 1);
+  console.log('Project deleted:', req.params.id);
+  res.status(204).send();
+});
+
+// 画像アップロード用のエンドポイント（簡易実装）
+app.post('/api/upload', (req, res) => {
+  console.log('POST /api/upload - image upload requested');
+  // 簡易実装：ダミーURLを返す
+  const dummyImageUrl = `https://via.placeholder.com/300x200?text=Image+${Date.now()}`;
+  console.log('Returning dummy image URL:', dummyImageUrl);
+  res.json({ 
+    url: dummyImageUrl,
+    message: 'Image upload simulated (local development mode)'
+  });
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running' });
+  res.json({ 
+    status: 'ok', 
+    message: 'Server is running',
+    database: DATABASE_URL ? 'configured' : 'not configured',
+    projectsCount: projects.length
+  });
 });
 
 // フロントエンドのルーティング対応
