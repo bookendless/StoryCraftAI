@@ -299,7 +299,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-full overflow-y-auto">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium text-on-surface">章構成リスト</h3>
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

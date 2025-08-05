@@ -38,7 +38,8 @@ Preferred communication style: Simple, everyday language.
 ### External Dependencies
 
 #### AI Integration
-- **OpenAI API**: GPT-4 integration for content generation including character suggestions, plot development, synopsis creation, chapter planning, episode design, and draft writing
+- **Gemini API**: Google's latest AI models (gemini-1.5-flash, gemini-2.0-flash, gemini-2.5-flash, gemini-2.5-pro) for content generation including character suggestions, plot development, synopsis creation, chapter planning, episode design, and draft writing
+- **OpenAI API**: Backup GPT-4 integration available
 - **Content Generation**: Structured prompts in Japanese for culturally appropriate content creation
 
 #### Database and Infrastructure

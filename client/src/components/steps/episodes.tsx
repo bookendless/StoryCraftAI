@@ -636,7 +636,9 @@ function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeD
         <div className="flex justify-end space-x-2 pt-4">
           <Button 
             variant="outline" 
-            onClick={() => onChange(null)}
+            onClick={() => {
+              onChange(null);
+            }}
             data-testid="button-cancel-episode"
           >
             キャンセル

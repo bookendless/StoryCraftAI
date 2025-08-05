@@ -9,6 +9,10 @@ import {
   generateCharacterSuggestions, generatePlotSuggestion, generateSynopsis,
   generateChapterSuggestions, generateEpisodeSuggestion, generateDraft
 } from "./services/openai";
+import {
+  generateCharacterSuggestionsWithGemini, generatePlotSuggestionWithGemini, generateSynopsisWithGemini,
+  generateChapterSuggestionsWithGemini, generateEpisodeSuggestionWithGemini, generateDraftWithGemini
+} from "./services/gemini";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 
 // Helper function for error handling
@@ -119,10 +123,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingCharacters = await storage.getCharacters(req.params.projectId);
       const characterNames = existingCharacters.map(c => c.name);
 
-      const suggestions = await generateCharacterSuggestions(
+      const suggestions = await generateCharacterSuggestionsWithGemini(
         project.title,
         project.genre,
-        characterNames
+        project.targetAudience || "一般読者",
+        3
       );
 
       res.json(suggestions);
@@ -174,10 +179,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const characters = await storage.getCharacters(req.params.projectId);
       const characterNames = characters.map(c => c.name);
 
-      const suggestion = await generatePlotSuggestion(
+      const suggestion = await generatePlotSuggestionWithGemini(
         project.title,
         project.genre,
-        characterNames
+        characters
       );
 
       res.json(suggestion);
@@ -232,11 +237,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const plotText = plot ? `${plot.theme} - ${plot.opening}` : "";
       const characterNames = characters.map(c => c.name);
 
-      const content = await generateSynopsis(
+      const content = await generateSynopsisWithGemini(
         project.title,
-        project.genre,
-        plotText,
-        characterNames
+        plot,
+        characters
       );
 
       res.json({ content });
@@ -300,10 +304,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const plotText = plot ? `${plot.theme} - ${plot.opening} - ${plot.development}` : "";
       const chapterTitles = existingChapters.map(c => c.title);
 
-      const suggestions = await generateChapterSuggestions(
+      const synopsis = await storage.getSynopsis(req.params.projectId);
+      const synopsisText = synopsis?.content || "";
+      
+      const suggestions = await generateChapterSuggestionsWithGemini(
         project.title,
-        plotText,
-        chapterTitles
+        plot,
+        synopsisText,
+        10
       );
 
       res.json(suggestions);
@@ -364,10 +372,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const characters = await storage.getCharacters(chapter.projectId);
       const characterNames = characters.map(c => c.name);
 
-      const suggestions = await generateEpisodeSuggestion(
+      const suggestions = await generateEpisodeSuggestionWithGemini(
         chapter.title,
         chapter.summary || "",
-        characterNames
+        characters
       );
 
       res.json(suggestions);
@@ -418,9 +426,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { tone = "バランスの取れた" } = req.body;
 
-      const content = await generateDraft(
-        episode.title,
-        episode.description || "",
+      const chapter = await storage.getChapter(episode.chapterId);
+      const episodes = await storage.getEpisodes(episode.chapterId);
+      const characters = await storage.getCharacters(chapter?.projectId || "");
+      
+      const content = await generateDraftWithGemini(
+        chapter?.title || "章",
+        episodes,
+        characters,
         tone
       );
 
