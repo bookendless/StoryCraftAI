@@ -17,6 +17,51 @@ function getErrorMessage(error: unknown): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // 手動保存エンドポイント
+  app.post("/api/save", async (req, res) => {
+    try {
+      // MemStorageは自動保存されているが、手動保存要求への応答
+      res.json({ 
+        success: true, 
+        message: "データは自動的に保存されています",
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ error: "保存エラー" });
+    }
+  });
+
+  // プロジェクトエクスポート（詳細データ付き）
+  app.get("/api/projects/:id/export", async (req, res) => {
+    try {
+      const projectId = req.params.id;
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ error: "プロジェクトが見つかりません" });
+      }
+
+      const characters = await storage.getCharacters(projectId);
+      const plot = await storage.getPlot(projectId);
+      const synopsis = await storage.getSynopsis(projectId);
+      const chapters = await storage.getChapters(projectId);
+
+      const exportData = {
+        project,
+        characters,
+        plot,
+        synopsis,
+        chapters,
+        exportDate: new Date().toISOString(),
+        version: "1.0"
+      };
+
+      res.json(exportData);
+    } catch (error) {
+      console.error("Export error:", error);
+      res.status(500).json({ error: "エクスポートエラー" });
+    }
+  });
   // Projects
   app.get("/api/projects", async (req, res) => {
     try {

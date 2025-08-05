@@ -11,6 +11,8 @@ import {
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
+import { join } from "path";
 
 export interface IStorage {
   // Projects
@@ -67,6 +69,7 @@ export class MemStorage implements IStorage {
   private chapters: Map<string, Chapter>;
   private episodes: Map<string, Episode>;
   private drafts: Map<string, Draft>;
+  private saveFilePath: string;
 
   constructor() {
     this.projects = new Map();
@@ -77,8 +80,22 @@ export class MemStorage implements IStorage {
     this.episodes = new Map();
     this.drafts = new Map();
     
-    // テスト用プロジェクトを追加
-    this.initializeTestData();
+    // ローカルファイル保存パス設定
+    const saveDir = join(process.cwd(), 'local-data');
+    if (!existsSync(saveDir)) {
+      mkdirSync(saveDir, { recursive: true });
+    }
+    this.saveFilePath = join(saveDir, 'story-projects.json');
+    
+    // ローカルファイルからデータを読み込み
+    this.loadFromFile();
+    
+    // テスト用プロジェクトを追加（ファイルが空の場合のみ）
+    if (this.projects.size === 0) {
+      this.initializeTestData();
+    }
+    
+    console.log(`[MemStorage] 初期化完了 - プロジェクト: ${this.projects.size}件`);
   }
 
   private initializeTestData() {
@@ -95,6 +112,48 @@ export class MemStorage implements IStorage {
       updatedAt: now
     };
     this.projects.set("1", testProject);
+    this.saveToFile();
+  }
+
+  private saveToFile() {
+    try {
+      const data = {
+        projects: Array.from(this.projects.entries()),
+        characters: Array.from(this.characters.entries()),
+        plots: Array.from(this.plots.entries()),
+        synopses: Array.from(this.synopses.entries()),
+        chapters: Array.from(this.chapters.entries()),
+        episodes: Array.from(this.episodes.entries()),
+        drafts: Array.from(this.drafts.entries()),
+        lastSaved: new Date().toISOString()
+      };
+      writeFileSync(this.saveFilePath, JSON.stringify(data, null, 2), 'utf8');
+      console.log(`[MemStorage] ローカルファイルに保存完了: ${this.saveFilePath}`);
+    } catch (error) {
+      console.error('[MemStorage] ファイル保存エラー:', error);
+    }
+  }
+
+  private loadFromFile() {
+    try {
+      if (existsSync(this.saveFilePath)) {
+        const fileContent = readFileSync(this.saveFilePath, 'utf8');
+        const data = JSON.parse(fileContent);
+        
+        // データを復元
+        this.projects = new Map(data.projects || []);
+        this.characters = new Map(data.characters || []);
+        this.plots = new Map(data.plots || []);
+        this.synopses = new Map(data.synopses || []);
+        this.chapters = new Map(data.chapters || []);
+        this.episodes = new Map(data.episodes || []);
+        this.drafts = new Map(data.drafts || []);
+        
+        console.log(`[MemStorage] ローカルファイルから読み込み完了: プロジェクト ${this.projects.size}件`);
+      }
+    } catch (error) {
+      console.error('[MemStorage] ファイル読み込みエラー:', error);
+    }
   }
 
   // Projects
@@ -122,6 +181,7 @@ export class MemStorage implements IStorage {
       updatedAt: now
     };
     this.projects.set(id, project);
+    this.saveToFile(); // 自動保存
     console.log(`[MemStorage] プロジェクト作成完了: ${id} - "${project.title}"`);
     return project;
   }
@@ -135,6 +195,7 @@ export class MemStorage implements IStorage {
     
     const updated = { ...project, ...updates, updatedAt: new Date() };
     this.projects.set(id, updated);
+    this.saveToFile(); // 自動保存
     console.log(`[MemStorage] プロジェクト更新完了: ${id} -> ステップ ${updated.currentStep}`);
     return updated;
   }
@@ -188,6 +249,7 @@ export class MemStorage implements IStorage {
       order: insertCharacter.order ?? 0
     };
     this.characters.set(id, character);
+    this.saveToFile(); // 自動保存
     return character;
   }
 
@@ -197,6 +259,7 @@ export class MemStorage implements IStorage {
     
     const updated = { ...character, ...updates };
     this.characters.set(id, updated);
+    this.saveToFile(); // 自動保存
     return updated;
   }
 
@@ -224,6 +287,7 @@ export class MemStorage implements IStorage {
       conclusion: insertPlot.conclusion ?? null
     };
     this.plots.set(id, plot);
+    this.saveToFile(); // 自動保存
     return plot;
   }
 
@@ -233,6 +297,7 @@ export class MemStorage implements IStorage {
     
     const updated = { ...plot, ...updates };
     this.plots.set(id, updated);
+    this.saveToFile(); // 自動保存
     return updated;
   }
 
@@ -250,6 +315,7 @@ export class MemStorage implements IStorage {
       style: insertSynopsis.style ?? null
     };
     this.synopses.set(id, synopsis);
+    this.saveToFile(); // 自動保存
     return synopsis;
   }
 
@@ -259,6 +325,7 @@ export class MemStorage implements IStorage {
     
     const updated = { ...synopsis, ...updates };
     this.synopses.set(id, updated);
+    this.saveToFile(); // 自動保存
     return updated;
   }
 

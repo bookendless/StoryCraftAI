@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { SettingsDialog } from "@/components/settings/settings-dialog";
+import { SaveButton } from "@/components/ui/save-button";
 import type { Project } from "@shared/schema";
 
 interface SidebarProps {
@@ -262,15 +263,26 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           )}
         </div>
         
+        {!collapsed && (
+          <div className="space-y-2">
+            <SaveButton variant="save" className="w-full" />
+            <SaveButton 
+              variant="export" 
+              projectId={project.id} 
+              className="w-full button-subtle" 
+            />
+          </div>
+        )}
+        
         <Button 
           className={`w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 material-transition elevation-1 ${
             collapsed ? "px-3" : ""
           }`}
           onClick={() => handleExport()}
-          data-testid="button-export"
+          data-testid="button-export-simple"
         >
           <Download className="w-4 h-4 icon-button-colorful" />
-          {!collapsed && <span className="ml-2">エクスポート</span>}
+          {!collapsed && <span className="ml-2">基本エクスポート</span>}
         </Button>
         
         {collapsed && (
