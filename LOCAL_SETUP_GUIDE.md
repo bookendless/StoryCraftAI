@@ -59,10 +59,38 @@ npx electron electron/main-simple.js
 ```
 
 **バッチファイルが失敗する場合の代替手順:**
+
+**方法1: 新しい修正版バッチファイル**
 ```cmd
-# 手動でコマンドを実行
+# 文字エンコーディング問題を修正
+start-simple.bat
+
+# または手動版
+start-manual.bat
+```
+
+**方法2: 手動コマンド（Node.js v20.6.0以降対応）**
+```cmd
+# 依存関係をインストール
 npm install
-npx tsx server/index.ts
+
+# 新しいNode.jsバージョン対応でサーバー起動
+node --import tsx/esm server/index.ts
+
+# 古いNode.jsバージョンの場合
+node -r tsx/register server/index.ts
+```
+
+**方法3: ローカル用package.jsonを使用**
+```cmd
+# ローカル専用のpackage.jsonをコピー
+copy package-local.json package.json
+
+# 簡単な起動
+npm start
+
+# Electronも同時起動
+npm run app
 ```
 
 **代替方法（PowerShell使用）:**
