@@ -411,7 +411,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
                               {(episode.events as string[]).map((event, idx) => (
                                 <li key={idx} className="flex items-start space-x-2">
                                   <span className="text-primary-500 mt-1">•</span>
-                                  <span>{event}</span>
+                                  <span>{String(event)}</span>
                                 </li>
                               ))}
                             </ul>

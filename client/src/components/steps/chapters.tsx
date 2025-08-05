@@ -397,7 +397,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                         </Badge>
                         {chapter.characterIds && Array.isArray(chapter.characterIds) && chapter.characterIds.length > 0 && (
                           <Badge variant="outline" data-testid={`badge-chapter-characters-${chapter.id}`}>
-                            {chapter.characterIds.length}名登場
+                            {String(chapter.characterIds.length)}名登場
                           </Badge>
                         )}
                       </div>

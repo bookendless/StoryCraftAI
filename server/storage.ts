@@ -572,4 +572,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// 開発用：MemStorageを使用（データベース準備中）
+export const storage = new MemStorage();

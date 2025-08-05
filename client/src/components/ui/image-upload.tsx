@@ -100,11 +100,14 @@ export function ImageUpload({ imageUrl, onImageChange, placeholder = "画像を�
       {imageUrl ? (
         <div className="relative group">
           <img
-            src={imageUrl.startsWith('/objects/') ? imageUrl : `/public-objects/${imageUrl}`}
+            src={imageUrl}
             alt="アップロード画像"
             className="w-full h-48 object-cover rounded-lg border-2 border-border"
             onError={(e) => {
-              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk3YTNiNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuOBv+OBpOOBi+OCiuOBvuOBm+OCkzwvdGV4dD4KPC9zdmc+';
+              // Lorem Picsumが失敗した場合は別の画像を試す
+              if (!e.currentTarget.src.includes('placeholder')) {
+                e.currentTarget.src = 'https://via.placeholder.com/400x300/f3f4f6/9ca3af?text=画像が見つかりません';
+              }
             }}
             data-testid="img-uploaded"
           />

@@ -57,6 +57,46 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
     }
   };
 
+  const handleExport = async () => {
+    try {
+      toast({
+        title: "エクスポート開始",
+        description: "プロジェクトデータを準備しています...",
+      });
+
+      // プロジェクトデータを収集
+      const projectData = {
+        project,
+        exportDate: new Date().toISOString(),
+        version: "1.0"
+      };
+
+      // JSON形式でダウンロード
+      const blob = new Blob([JSON.stringify(projectData, null, 2)], {
+        type: "application/json"
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${project.title}_export_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "エクスポート完了",
+        description: "プロジェクトデータをダウンロードしました。",
+      });
+    } catch (error) {
+      toast({
+        title: "エクスポートエラー",
+        description: "プロジェクトのエクスポートに失敗しました。",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStepStatus = (stepId: number) => {
     if (stepId < project.currentStep) return "completed";
     if (stepId === project.currentStep) return "active";
@@ -222,6 +262,7 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
           className={`w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 material-transition elevation-1 ${
             collapsed ? "px-3" : ""
           }`}
+          onClick={() => handleExport()}
           data-testid="button-export"
         >
           <Download className="w-4 h-4 icon-button-colorful" />
