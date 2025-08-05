@@ -1,6 +1,10 @@
-const { app, BrowserWindow, Menu, dialog } = require('electron');
-const path = require('path');
-const { spawn } = require('child_process');
+import { app, BrowserWindow, Menu, dialog } from 'electron';
+import path from 'path';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;

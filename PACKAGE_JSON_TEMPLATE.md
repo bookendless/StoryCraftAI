@@ -52,7 +52,6 @@
   "author": "Story Builder Team",
   "main": "electron/main.js",
   "homepage": "./",
-  "type": "module",
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",

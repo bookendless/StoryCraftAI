@@ -19,9 +19,14 @@ The application is fully configured for creating Windows EXE files using Electro
 - `build-electron.sh`: Automated build script
 
 ### Build Instructions:
-1. Run the build script: `./build-electron.sh`
-2. The EXE file will be created in the `dist-electron` folder
+1. For local development: See `LOCAL_SETUP_GUIDE.md`
+2. For EXE build: See `EXE_BUILD_INSTRUCTIONS.md` and `PACKAGE_JSON_TEMPLATE.md`
 3. The app includes a full Japanese interface with native menu system
+
+### Known Issues:
+- Replit environment cannot build EXE files due to Electron limitations
+- Local environment requires package.json modifications for proper ES Module handling
+- Current electron/main.js has been updated to support ES Module imports
 
 ## System Architecture
 
