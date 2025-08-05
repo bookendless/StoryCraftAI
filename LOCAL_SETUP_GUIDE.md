@@ -38,18 +38,33 @@
 
 ## ローカル環境での起動方法
 
-### 最も簡単な方法（推奨）
+### 最も簡単な方法（推奨）- Windows版
 ES Moduleの問題を完全に回避する方法：
 
 ```bash
 # 1. 依存関係のインストール
 npm install
 
-# 2. 最初のターミナル: サーバーを起動
-npm run dev
+# 2. Windows用起動スクリプトを使用
+start-windows.bat
 
-# 3. サーバーが起動したら、2つ目のターミナルで簡易版Electronを起動
+# 3. サーバーが起動したら、別のコマンドプロンプトでElectronを起動
 npx electron electron/main-simple.js
+```
+
+**代替方法（PowerShell使用）:**
+```powershell
+# PowerShellの場合
+$env:NODE_ENV="development"; npm run dev
+```
+
+**代替方法（cross-env使用）:**
+```bash
+# cross-envをインストール
+npm install -g cross-env
+
+# cross-envを使用してサーバー起動
+cross-env NODE_ENV=development tsx server/index.ts
 ```
 
 `main-simple.js` は CommonJS 形式で、ES Module の問題がありません。
@@ -148,7 +163,20 @@ app.whenReady().then(createWindow);
 
 ### よくある問題と解決法
 
-1. **`vite` コマンドが見つからない**
+1. **Windows環境変数エラー（'NODE_ENV' は...認識されていません）**
+   ```bash
+   # 解決方法1: 用意されたバッチファイルを使用
+   start-windows.bat
+   
+   # 解決方法2: PowerShellを使用
+   $env:NODE_ENV="development"; tsx server/index.ts
+   
+   # 解決方法3: cross-envをインストール
+   npm install -g cross-env
+   cross-env NODE_ENV=development tsx server/index.ts
+   ```
+
+2. **`vite` コマンドが見つからない**
    ```bash
    npm install
    # または
