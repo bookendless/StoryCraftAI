@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Chapter, Character } from "@shared/schema";
 
-export default function Chapters() {
-  const params = useParams();
-  const projectId = params.projectId;
+interface ChaptersProps {
+  projectId: string;
+}
+
+export default function Chapters({ projectId }: ChaptersProps) {
   const { toast } = useToast();
   
   const [totalChapters, setTotalChapters] = useState(8);
