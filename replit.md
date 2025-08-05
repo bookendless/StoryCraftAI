@@ -28,6 +28,17 @@ The application is fully configured for creating Windows EXE files using Electro
 - Local environment requires package.json modifications for proper ES Module handling
 - Current electron/main.js has been updated to support ES Module imports
 
+### Recent Fixes (2025-08-05):
+- ✅ 画像表示エラー修正完了（Base64フォールバック機能追加）
+- ✅ サイドバーナビゲーション機能修復完了
+- ✅ 右画面スクロール問題修正完了
+- ✅ プロット・あらすじ・章立て保存機能動作確認
+- ✅ エクスポート機能実装完了
+- ✅ LSPエラー修正（型安全性向上）
+- ✅ キャンセルボタンエラー修正完了
+- ✅ MemStorageによるデータ永続化確保
+- ✅ Base64画像アップロード機能完全動作
+
 ## System Architecture
 
 ### Frontend Architecture

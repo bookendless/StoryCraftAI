@@ -122,15 +122,20 @@ export class MemStorage implements IStorage {
       updatedAt: now
     };
     this.projects.set(id, project);
+    console.log(`[MemStorage] プロジェクト作成完了: ${id} - "${project.title}"`);
     return project;
   }
 
   async updateProject(id: string, updates: Partial<Project>): Promise<Project> {
     const project = this.projects.get(id);
-    if (!project) throw new Error("Project not found");
+    if (!project) {
+      console.log(`[MemStorage] プロジェクトが見つかりません: ${id}`);
+      throw new Error("Project not found");
+    }
     
     const updated = { ...project, ...updates, updatedAt: new Date() };
     this.projects.set(id, updated);
+    console.log(`[MemStorage] プロジェクト更新完了: ${id} -> ステップ ${updated.currentStep}`);
     return updated;
   }
 

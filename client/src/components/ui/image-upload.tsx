@@ -40,23 +40,14 @@ export function ImageUpload({ imageUrl, onImageChange, placeholder = "画像を�
     setIsUploading(true);
 
     try {
-      // ローカル開発用：簡易画像アップロード処理
-      const uploadResponse = await fetch('/api/objects/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('アップロードURLの取得に失敗しました');
-      }
-
-      const { uploadURL } = await uploadResponse.json();
-
-      // ローカル開発：実際のファイルアップロードの代わりに
-      // プリサインURLをそのまま画像URLとして使用
-      onImageChange(uploadURL);
+      // ローカル開発用：ファイルをBase64で変換して直接使用
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        console.log('画像をBase64に変換完了:', base64String.substring(0, 50) + '...');
+        onImageChange(base64String);
+      };
+      reader.readAsDataURL(file);
 
       toast({
         title: "成功",

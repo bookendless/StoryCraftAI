@@ -52,8 +52,12 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
   });
 
   const handleStepClick = (stepId: number) => {
+    console.log(`[Sidebar] ステップクリック: ${stepId}, 現在のステップ: ${project.currentStep}`);
     if (stepId <= project.currentStep || stepId === project.currentStep + 1) {
+      console.log(`[Sidebar] ステップ更新を実行: ${stepId}`);
       updateStepMutation.mutate(stepId);
+    } else {
+      console.log(`[Sidebar] ステップ更新をスキップ（条件不一致）`);
     }
   };
 
