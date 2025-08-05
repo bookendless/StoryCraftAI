@@ -38,17 +38,35 @@
 
 ## ローカル環境での起動方法
 
+### 最も簡単な方法（推奨）
+ES Moduleの問題を完全に回避する方法：
+
+```bash
+# 1. 依存関係のインストール
+npm install
+
+# 2. 最初のターミナル: サーバーを起動
+npm run dev
+
+# 3. サーバーが起動したら、2つ目のターミナルで簡易版Electronを起動
+npx electron electron/main-simple.js
+```
+
+`main-simple.js` は CommonJS 形式で、ES Module の問題がありません。
+
 ### 方法1: 開発モードで起動
 ```bash
 # 1. 依存関係のインストール
 npm install
 
-# 2. サーバーを起動（バックグラウンド）
-npm run dev &
+# 2. 最初のターミナル: サーバーを起動
+npm run dev
 
-# 3. 別のターミナルでElectronを起動
+# 3. 2つ目のターミナル: Electronを起動
 npx electron electron/main.js
 ```
+
+**重要:** サーバーが完全に起動してから（"serving on port 5000"が表示されてから）Electronを起動してください。
 
 ### 方法2: コンカレント起動（推奨）
 ```bash

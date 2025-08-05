@@ -105,11 +105,14 @@ function createWindow() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 
-  if (isDev) {
-    // 開発環境では、Viteサーバーに接続
-    startDevServer();
+  // 開発環境では直接localhost:5000に接続
+  // 本番環境では、ビルドされたファイルをロード
+  if (isDev || process.env.NODE_ENV === 'development') {
+    // 開発サーバーが起動するまで少し待機
+    setTimeout(() => {
+      mainWindow.loadURL('http://localhost:5000');
+    }, 2000);
   } else {
-    // 本番環境では、ビルドされたファイルをロード
     mainWindow.loadFile(path.join(__dirname, '../client/dist/index.html'));
   }
 
@@ -125,18 +128,7 @@ function createWindow() {
   });
 }
 
-function startDevServer() {
-  // サーバーを起動
-  serverProcess = spawn('npm', ['run', 'dev'], {
-    cwd: path.join(__dirname, '..'),
-    stdio: 'inherit'
-  });
-
-  // サーバーが起動するまで待機してからロード
-  setTimeout(() => {
-    mainWindow.loadURL('http://localhost:5000');
-  }, 3000);
-}
+// この関数は不要になったため削除
 
 app.whenReady().then(createWindow);
 
