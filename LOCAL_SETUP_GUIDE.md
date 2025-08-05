@@ -89,16 +89,25 @@ node --import tsx/esm server/index.ts
 node -r tsx/register server/index.ts
 ```
 
-**方法3: ローカル用package.jsonを使用**
+**方法3: ローカル専用ビルド（Replit設定問題回避）**
 ```cmd
-# ローカル専用のpackage.jsonをコピー
-copy package-local.json package.json
+# ローカル専用設定でビルド
+build-local.bat
 
-# 簡単な起動
-npm start
+# Electronアプリ起動
+start-electron.bat
+```
 
-# Electronも同時起動
-npm run app
+**方法4: 開発サーバー（ビルド不要）**
+```cmd
+# バックエンドサーバー起動
+start-nodejs.bat
+
+# 別のコマンドプロンプトで開発サーバー起動
+start-local-dev.bat
+
+# Electronでhttp://localhost:3000にアクセス
+# main-debug.jsのURLを変更してから起動
 ```
 
 **代替方法（PowerShell使用）:**

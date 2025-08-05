@@ -1,0 +1,53 @@
+AI Story Builder - Build and Start
+
+Step 1: Installing dependencies...
+
+changed 1 package, and audited 1134 packages in 1s
+
+137 packages are looking for funding
+  run `npm fund` for details
+
+11 vulnerabilities (3 low, 8 moderate)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+Step 2: Building frontend...
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+X [ERROR] Top-level await is currently not supported with the "cjs" output format
+
+    vite.config.ts:13:10:
+      13 │           await import("@replit/vite-plugin-cartographer").then((m) =>
+         ╵           ~~~~~
+
+X [ERROR] "@replit/vite-plugin-runtime-error-modal" resolved to an ESM file. ESM file cannot be loaded by `require`. See https://vite.dev/guide/troubleshooting.html#this-package-is-esm-only for more details. [plugin externalize-deps]
+
+    vite.config.ts:4:32:
+      4 │ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+        ╵                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+failed to load config from C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\vite.config.ts
+error during build:
+Error: Build failed with 2 errors:
+vite.config.ts:4:32: ERROR: [plugin: externalize-deps] "@replit/vite-plugin-runtime-error-modal" resolved to an ESM file. ESM file cannot be loaded by `require`. See https://vite.dev/guide/troubleshooting.html#this-package-is-esm-only for more details.
+vite.config.ts:13:10: ERROR: Top-level await is currently not supported with the "cjs" output format
+    at failureErrorWithLog (C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:1472:15)
+    at C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:945:25
+    at runOnEndCallbacks (C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:1315:45)
+    at buildResponseToResult (C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:943:7)
+    at C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:970:16
+    at responseCallbacks.<computed> (C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:622:9)
+    at handleIncomingPacket (C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:677:12)
+    at Socket.readFromStdout (C:\Users\Uniso\Desktop\StoryCraftAI (1)\StoryCraftAI\node_modules\vite\node_modules\esbuild\lib\main.js:600:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+Failed to build frontend
+Press any key to continue . . .
