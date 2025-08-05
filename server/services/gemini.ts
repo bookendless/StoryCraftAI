@@ -70,6 +70,72 @@ export async function generateCharacterSuggestionsWithGemini(
   }
 }
 
+export async function completeCharacterWithGemini(
+  character: any,
+  project: any
+): Promise<any> {
+  try {
+    const prompt = `
+あなたは創作支援AIです。以下のキャラクターの空欄部分を補完してください。
+
+【作品情報】
+- タイトル: ${project.title}
+- ジャンル: ${project.genre}
+
+【既存キャラクター情報】
+- 名前: ${character.name}
+- 説明: ${character.description || "（空欄）"}
+- 性格: ${character.personality || "（空欄）"}
+- 背景: ${character.background || "（空欄）"}
+- 役割: ${character.role || "（空欄）"}
+- 所属: ${character.affiliation || "（空欄）"}
+
+【要求】
+空欄部分のみを補完し、以下のJSON形式で回答してください：
+{
+  "description": "キャラクターの詳細説明",
+  "personality": "性格的特徴",
+  "background": "背景・設定",
+  "role": "物語での役割",
+  "affiliation": "所属・立場"
+}
+
+既存の内容がある項目は変更せず、空欄の部分のみ魅力的に補完してください。
+`;
+
+    const response = await genAI.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+
+    const text = response.text || "";
+    
+    try {
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const completion = JSON.parse(jsonMatch[0]);
+        // 空欄の項目のみ補完
+        const result: any = {};
+        if (!character.description && completion.description) result.description = completion.description;
+        if (!character.personality && completion.personality) result.personality = completion.personality;
+        if (!character.background && completion.background) result.background = completion.background;
+        if (!character.role && completion.role) result.role = completion.role;
+        if (!character.affiliation && completion.affiliation) result.affiliation = completion.affiliation;
+        
+        return result;
+      }
+      
+      return {};
+    } catch (parseError) {
+      console.error("JSON解析エラー:", parseError);
+      return {};
+    }
+  } catch (error) {
+    console.error("Gemini API error:", error);
+    throw new Error(`キャラクター補完に失敗しました: ${error}`);
+  }
+}
+
 export async function generatePlotSuggestionWithGemini(
   projectTitle: string,
   genre: string,
@@ -79,7 +145,7 @@ export async function generatePlotSuggestionWithGemini(
     const characterNames = characters.map(c => c.name).join(", ");
     
     const prompt = `
-あなたは創作支援AIです。以下の条件に基づいて魅力的なプロット構成を提案してください。
+あなたは創作支援AIです。以下の条件に基づいて起承転結の全構成を提案してください。
 
 【作品情報】
 - タイトル: ${projectTitle}
@@ -89,14 +155,13 @@ export async function generatePlotSuggestionWithGemini(
 【出力形式】
 以下の要素を含むJSON形式で回答してください：
 {
-  "mainConflict": "主要な対立・問題",
-  "incitingIncident": "発端となる出来事",
-  "plotTwists": ["展開の転機1", "展開の転機2"],
-  "climax": "クライマックス",
-  "resolution": "解決",
-  "themes": ["テーマ1", "テーマ2"],
-  "tone": "作品の雰囲気",
-  "notes": "追加の構成メモ"
+  "theme": "メインテーマ",
+  "setting": "舞台設定",
+  "hook": "読者を引きつける要素",
+  "opening": "起：物語の始まり、状況設定",
+  "development": "承：展開、発展部分",
+  "climax": "転：転換点、クライマックス",
+  "conclusion": "結：結末、解決"
 }
 
 日本語で、そのジャンルに適した魅力的で読者を引き込むプロットを作成してください。

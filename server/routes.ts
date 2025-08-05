@@ -13,7 +13,7 @@ import {
   generateChapterSuggestions, generateEpisodeSuggestion, generateDraft
 } from "./services/openai";
 import {
-  generateCharacterSuggestionsWithGemini, generatePlotSuggestionWithGemini, generateSynopsisWithGemini,
+  generateCharacterSuggestionsWithGemini, completeCharacterWithGemini, generatePlotSuggestionWithGemini, generateSynopsisWithGemini,
   generateChapterSuggestionsWithGemini, generateEpisodeSuggestionWithGemini, generateDraftWithGemini
 } from "./services/gemini";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
@@ -80,6 +80,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const characters = await storage.getCharacters(req.params.projectId);
       res.json(characters);
     } catch (error) {
+      res.status(500).json({ message: getErrorMessage(error) });
+    }
+  });
+
+  // Character completion API
+  app.post("/api/characters/:characterId/complete", async (req, res) => {
+    try {
+      const character = await storage.getCharacter(req.params.characterId);
+      if (!character) {
+        return res.status(404).json({ message: "Character not found" });
+      }
+
+      const project = await storage.getProject(character.projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      const completion = await completeCharacterWithGemini(character, project);
+      
+      // 補完されたデータでキャラクターを更新
+      const updatedCharacter = await storage.updateCharacter(req.params.characterId, completion);
+      
+      res.json(updatedCharacter);
+    } catch (error) {
+      console.error("Character completion error:", error);
       res.status(500).json({ message: getErrorMessage(error) });
     }
   });

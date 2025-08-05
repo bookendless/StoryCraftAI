@@ -107,16 +107,44 @@ export default function Characters({ projectId }: CharactersProps) {
       return response.json();
     },
     onSuccess: (suggestions) => {
-      // AI提案を表示するダイアログなどを実装
-      toast({
-        title: "AI提案完了",
-        description: `${suggestions.length}個のキャラクター案を生成しました。`,
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "characters"] });
+      const toastResult = toast({
+        title: "AI生成完了",
+        description: `${suggestions.length}個のキャラクターを生成しました。`,
       });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
     },
     onError: () => {
       toast({
         title: "エラー",
-        description: "AI提案の生成に失敗しました。",
+        description: "AI生成に失敗しました。",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // キャラクター空欄補完機能
+  const completeCharacterMutation = useMutation({
+    mutationFn: async (characterId: string) => {
+      const response = await apiRequest("POST", `/api/characters/${characterId}/complete`);
+      return response.json();
+    },
+    onSuccess: (completedCharacter) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "characters"] });
+      const toastResult = toast({
+        title: "AI補完完了",
+        description: "キャラクター情報を補完しました。",
+      });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
+    },
+    onError: () => {
+      toast({
+        title: "エラー",
+        description: "AI補完に失敗しました。",
         variant: "destructive",
       });
     },
@@ -296,6 +324,17 @@ export default function Characters({ projectId }: CharactersProps) {
                         </div>
                       </div>
                       <div className="flex items-center space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => completeCharacterMutation.mutate(character.id)}
+                          disabled={completeCharacterMutation.isPending}
+                          data-testid={`button-complete-character-${character.id}`}
+                          className="bg-primary-500 hover:bg-primary-600 text-white"
+                          title="AI補完"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"

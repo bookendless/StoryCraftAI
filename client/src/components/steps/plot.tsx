@@ -27,6 +27,8 @@ export default function Plot({ projectId }: PlotProps) {
     climax: "",
     conclusion: ""
   });
+  const [aiSuggestion, setAiSuggestion] = useState<Partial<Plot> | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
 
   const { data: plot, isLoading } = useQuery<Plot>({
     queryKey: ["/api/projects", projectId, "plot"],
@@ -52,10 +54,13 @@ export default function Plot({ projectId }: PlotProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "plot"] });
-      toast({
+      const toastResult = toast({
         title: "保存完了",
         description: "プロット情報を保存しました。",
       });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
     },
     onError: () => {
       toast({
@@ -72,20 +77,30 @@ export default function Plot({ projectId }: PlotProps) {
       return response.json();
     },
     onSuccess: (suggestion) => {
-      setPlotData(prev => ({ ...prev, ...suggestion }));
-      toast({
-        title: "AI提案完了",
-        description: "プロット構成を生成しました。",
+      setAiSuggestion(suggestion);
+      setShowComparison(true);
+      const toastResult = toast({
+        title: "AI生成完了",
+        description: "プロット構成を生成しました。下部のAI提案で確認できます。",
       });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
     },
     onError: () => {
       toast({
         title: "エラー",
-        description: "AI提案の生成に失敗しました。",
+        description: "AI生成に失敗しました。",
         variant: "destructive",
       });
     },
   });
+
+  const applyAiSuggestion = (field: string) => {
+    if (aiSuggestion && aiSuggestion[field as keyof Plot]) {
+      setPlotData(prev => ({ ...prev, [field]: aiSuggestion[field as keyof Plot] }));
+    }
+  };
 
   const handleSave = () => {
     savePlotMutation.mutate(plotData);
@@ -280,17 +295,59 @@ export default function Plot({ projectId }: PlotProps) {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary-600 mb-4">
-                AIがあなたのキャラクター設定を基に、魅力的なプロット構成を提案します。
+                AIがあなたのキャラクター設定を基に、起承転結の全構成を提案します。
               </p>
               <Button
                 onClick={() => generatePlotMutation.mutate()}
                 disabled={generatePlotMutation.isPending}
                 data-testid="button-ai-suggest-plot"
-                className="bg-primary-500 hover:bg-primary-600 text-white"
+                className="bg-primary-500 hover:bg-primary-600 text-white mb-4"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
-                プロット構成を生成
+                {generatePlotMutation.isPending ? "AI生成中..." : "起承転結を完全生成"}
               </Button>
+
+              {/* AI提案との比較表示 */}
+              {aiSuggestion && showComparison && (
+                <div className="mt-6 space-y-4">
+                  <h4 className="font-medium text-primary-700">AI生成プロット vs あなたの入力</h4>
+                  
+                  {['theme', 'opening', 'development', 'climax', 'conclusion'].map((field) => (
+                    <div key={field} className="border rounded-lg p-4 bg-white">
+                      <h5 className="font-medium mb-2 capitalize">{
+                        field === 'theme' ? 'テーマ' :
+                        field === 'opening' ? '起' :
+                        field === 'development' ? '承' :
+                        field === 'climax' ? '転' : '結'
+                      }</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-gray-600">あなたの入力</label>
+                          <p className="text-sm p-2 bg-gray-50 rounded border min-h-[60px]">
+                            {plotData[field as keyof Plot] || "（未入力）"}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-primary-600">AI提案</label>
+                          <div className="text-sm p-2 bg-primary-50 rounded border min-h-[60px] relative">
+                            {aiSuggestion[field as keyof Plot] || "（提案なし）"}
+                            {aiSuggestion[field as keyof Plot] && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="absolute top-1 right-1 h-6 px-2 text-xs"
+                                onClick={() => applyAiSuggestion(field)}
+                              >
+                                適用
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
