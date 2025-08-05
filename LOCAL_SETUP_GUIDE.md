@@ -45,11 +45,24 @@ ES Moduleの問題を完全に回避する方法：
 # 1. 依存関係のインストール
 npm install
 
-# 2. Windows用起動スクリプトを使用
+# 2a. 改良版バッチファイル（推奨）
 start-windows.bat
+
+# 2b. もしくはシンプル版
+start-windows-simple.bat
+
+# 2c. 直接起動版（最後の手段）
+start-direct.bat
 
 # 3. サーバーが起動したら、別のコマンドプロンプトでElectronを起動
 npx electron electron/main-simple.js
+```
+
+**バッチファイルが失敗する場合の代替手順:**
+```cmd
+# 手動でコマンドを実行
+npm install
+npx tsx server/index.ts
 ```
 
 **代替方法（PowerShell使用）:**
