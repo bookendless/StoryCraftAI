@@ -79,16 +79,151 @@ app.delete('/api/projects/:id', (req, res) => {
   res.status(204).send();
 });
 
-// 画像アップロード用のエンドポイント（簡易実装）
+// キャラクター管理
+let characters = [];
+
+app.get('/api/projects/:projectId/characters', (req, res) => {
+  const projectCharacters = characters.filter(c => c.projectId === req.params.projectId);
+  console.log('GET /api/projects/:projectId/characters - returning', projectCharacters.length, 'characters');
+  res.json(projectCharacters);
+});
+
+app.post('/api/projects/:projectId/characters', (req, res) => {
+  console.log('POST /api/projects/:projectId/characters - creating character:', req.body);
+  const newCharacter = {
+    id: Date.now().toString(),
+    projectId: req.params.projectId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...req.body
+  };
+  characters.push(newCharacter);
+  console.log('Character created with ID:', newCharacter.id);
+  res.status(201).json(newCharacter);
+});
+
+app.put('/api/projects/:projectId/characters/:id', (req, res) => {
+  const index = characters.findIndex(c => c.id === req.params.id && c.projectId === req.params.projectId);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Character not found' });
+  }
+  characters[index] = {
+    ...characters[index],
+    ...req.body,
+    updatedAt: new Date().toISOString()
+  };
+  console.log('Character updated:', characters[index].id);
+  res.json(characters[index]);
+});
+
+// プロット管理
+let plots = [];
+
+app.get('/api/projects/:projectId/plots', (req, res) => {
+  const projectPlots = plots.filter(p => p.projectId === req.params.projectId);
+  res.json(projectPlots);
+});
+
+app.post('/api/projects/:projectId/plots', (req, res) => {
+  const newPlot = {
+    id: Date.now().toString(),
+    projectId: req.params.projectId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...req.body
+  };
+  plots.push(newPlot);
+  res.status(201).json(newPlot);
+});
+
+// シノプシス管理
+let synopses = [];
+
+app.get('/api/projects/:projectId/synopses', (req, res) => {
+  const projectSynopses = synopses.filter(s => s.projectId === req.params.projectId);
+  res.json(projectSynopses);
+});
+
+app.post('/api/projects/:projectId/synopses', (req, res) => {
+  const newSynopsis = {
+    id: Date.now().toString(),
+    projectId: req.params.projectId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...req.body
+  };
+  synopses.push(newSynopsis);
+  res.status(201).json(newSynopsis);
+});
+
+// 画像アップロード用のエンドポイント（本格実装）
 app.post('/api/upload', (req, res) => {
   console.log('POST /api/upload - image upload requested');
-  // 簡易実装：ダミーURLを返す
-  const dummyImageUrl = `https://via.placeholder.com/300x200?text=Image+${Date.now()}`;
-  console.log('Returning dummy image URL:', dummyImageUrl);
+  
+  // ローカル開発用：実際のファイルアップロード処理をシミュレート
+  const fileTypes = ['character', 'scene', 'concept'];
+  const randomType = fileTypes[Math.floor(Math.random() * fileTypes.length)];
+  const imageUrl = `https://picsum.photos/400/300?random=${Date.now()}`;
+  
+  console.log('Generated image URL:', imageUrl);
   res.json({ 
-    url: dummyImageUrl,
-    message: 'Image upload simulated (local development mode)'
+    url: imageUrl,
+    type: randomType,
+    filename: `upload_${Date.now()}.jpg`,
+    message: 'Image processed successfully (local development mode)'
   });
+});
+
+// AI生成エンドポイント（モック実装）
+app.post('/api/ai/generate-character', (req, res) => {
+  console.log('POST /api/ai/generate-character - generating character with prompt:', req.body.prompt);
+  
+  const sampleCharacters = [
+    {
+      name: "田中太郎",
+      age: 25,
+      occupation: "エンジニア",
+      personality: "内向的で論理的思考を持つ。技術に対する情熱が強い。",
+      background: "都市部で育ち、大学でコンピューターサイエンスを学んだ。",
+      goals: "革新的なソフトウェアを開発して世界を変えたい。"
+    },
+    {
+      name: "山田花子",
+      age: 22,
+      occupation: "アーティスト",
+      personality: "創造的で感情豊か。自由を愛する芸術家魂を持つ。",
+      background: "地方の小さな町で育ち、都市部の美術大学に進学。",
+      goals: "自分の作品で人々の心を動かしたい。"
+    }
+  ];
+  
+  const randomCharacter = sampleCharacters[Math.floor(Math.random() * sampleCharacters.length)];
+  
+  setTimeout(() => {
+    res.json({
+      character: randomCharacter,
+      message: 'キャラクターが生成されました（デモ版）'
+    });
+  }, 1000); // 1秒の遅延でAI処理をシミュレート
+});
+
+app.post('/api/ai/generate-plot', (req, res) => {
+  console.log('POST /api/ai/generate-plot - generating plot');
+  
+  const samplePlot = {
+    title: "運命の出会い",
+    summary: "主人公が偶然の出会いから始まる冒険の物語。困難を乗り越えながら成長していく。",
+    mainConflict: "古い価値観と新しい世界観の衝突",
+    resolution: "理解と協力を通じて新しい未来を築く",
+    themes: ["成長", "友情", "勇気", "変化"]
+  };
+  
+  setTimeout(() => {
+    res.json({
+      plot: samplePlot,
+      message: 'プロットが生成されました（デモ版）'
+    });
+  }, 1500);
 });
 
 app.get('/api/health', (req, res) => {
