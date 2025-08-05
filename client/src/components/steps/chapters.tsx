@@ -29,6 +29,10 @@ export default function Chapters({ projectId }: ChaptersProps) {
   const { data: chapters = [], isLoading: chaptersLoading } = useQuery<Chapter[]>({
     queryKey: [`/api/projects/${projectId}/chapters`],
     enabled: !!projectId,
+    select: (data) => {
+      // 章を作成順（order）でソート
+      return [...data].sort((a, b) => (a.order || 0) - (b.order || 0));
+    }
   });
 
   const { data: characters = [] } = useQuery<Character[]>({
@@ -45,14 +49,17 @@ export default function Chapters({ projectId }: ChaptersProps) {
       const response = await apiRequest("POST", `/api/projects/${projectId}/chapters/generate`);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       if (projectId) {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
       }
-      toast({
+      const toastResult = toast({
         title: "AI生成完了",
         description: "章構成を生成しました。",
       });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
     },
     onError: (error) => {
       toast({
@@ -137,10 +144,13 @@ export default function Chapters({ projectId }: ChaptersProps) {
       if (projectId) {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
       }
-      toast({
+      const toastResult = toast({
         title: "章作成完了",
         description: "新しい章を追加しました。",
       });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
     },
     onError: (error) => {
       console.error("Chapter creation error:", error);
@@ -161,10 +171,13 @@ export default function Chapters({ projectId }: ChaptersProps) {
       if (projectId) {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
       }
-      toast({
+      const toastResult = toast({
         title: "章更新完了",
         description: "章を更新しました。",
       });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
     },
     onError: (error) => {
       console.error("Chapter update error:", error);
@@ -184,10 +197,13 @@ export default function Chapters({ projectId }: ChaptersProps) {
       if (projectId) {
         queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
       }
-      toast({
+      const toastResult = toast({
         title: "章削除完了",
         description: "章を削除しました。",
       });
+      setTimeout(() => {
+        toastResult.dismiss?.();
+      }, 1000);
     },
   });
 

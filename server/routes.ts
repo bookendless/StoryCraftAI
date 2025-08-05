@@ -336,7 +336,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         10
       );
 
-      res.json(suggestions);
+      // 生成された章を実際に保存
+      const createdChapters = [];
+      if (suggestions && Array.isArray(suggestions)) {
+        for (let i = 0; i < suggestions.length; i++) {
+          const suggestion = suggestions[i];
+          const chapterData = {
+            title: suggestion.title || `第${existingChapters.length + i + 1}章`,
+            summary: suggestion.summary || "",
+            structure: suggestion.structure || "ki",
+            order: existingChapters.length + i,
+            estimatedWords: suggestion.estimatedWords || Math.ceil(50000 / 10),
+            estimatedReadingTime: suggestion.estimatedReadingTime || Math.ceil(50000 / 10 / 250),
+            characterIds: [],
+            projectId: req.params.projectId
+          };
+          
+          const chapter = await storage.createChapter(chapterData);
+          createdChapters.push(chapter);
+        }
+      }
+
+      res.json({ createdChapters, suggestions });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
