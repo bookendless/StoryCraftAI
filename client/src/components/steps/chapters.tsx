@@ -22,12 +22,14 @@ export default function Chapters() {
   const [estimatedLength, setEstimatedLength] = useState(50000);
 
   // Fetch data
-  const { data: chapters = [], isLoading: chaptersLoading } = useQuery({
+  const { data: chapters = [], isLoading: chaptersLoading } = useQuery<Chapter[]>({
     queryKey: [`/api/projects/${projectId}/chapters`],
+    enabled: !!projectId,
   });
 
-  const { data: characters = [] } = useQuery({
+  const { data: characters = [] } = useQuery<Character[]>({
     queryKey: [`/api/projects/${projectId}/characters`],
+    enabled: !!projectId,
   });
 
   // Mutations
@@ -156,11 +158,21 @@ export default function Chapters() {
   });
 
   const addChapter = () => {
+    if (!projectId) {
+      toast({
+        title: "エラー",
+        description: "プロジェクトIDが見つかりません。",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const chapterArray = Array.isArray(chapters) ? chapters : [];
     const newChapter = {
-      title: `第${chapters.length + 1}章`,
+      title: `第${chapterArray.length + 1}章`,
       summary: "",
-      structure: getStructureForChapter(chapters.length + 1),
-      order: chapters.length,
+      structure: getStructureForChapter(chapterArray.length + 1),
+      order: chapterArray.length,
       estimatedWords: Math.ceil(estimatedLength / totalChapters),
       estimatedReadingTime: Math.ceil(estimatedLength / totalChapters / 250), // 250文字/分の読書速度
       characterIds: [],
@@ -171,14 +183,16 @@ export default function Chapters() {
   };
 
   const updateChapter = (chapterIndex: number, updates: any) => {
-    const chapter = chapters[chapterIndex];
+    const chapterArray = Array.isArray(chapters) ? chapters : [];
+    const chapter = chapterArray[chapterIndex];
     if (chapter) {
       updateChapterMutation.mutate({ id: chapter.id, ...updates });
     }
   };
 
   const removeChapter = (chapterIndex: number) => {
-    const chapter = chapters[chapterIndex];
+    const chapterArray = Array.isArray(chapters) ? chapters : [];
+    const chapter = chapterArray[chapterIndex];
     if (chapter) {
       deleteChapterMutation.mutate(chapter.id);
     }
@@ -343,7 +357,7 @@ export default function Chapters() {
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto min-h-0">
               <div className="space-y-4">
-                {chapters.map((chapter: Chapter, index: number) => (
+                {Array.isArray(chapters) && chapters.map((chapter: Chapter, index: number) => (
                   <div key={chapter.id} className="border rounded-lg p-4 space-y-3" data-testid={`chapter-card-${chapter.id}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -426,7 +440,7 @@ export default function Chapters() {
                             <SelectValue placeholder="キャラクターを追加" />
                           </SelectTrigger>
                           <SelectContent>
-                            {characters
+                            {Array.isArray(characters) && characters
                               .filter((char: Character) => !chapter.characterIds?.includes(char.id))
                               .map((character: Character) => (
                                 <SelectItem key={character.id} value={character.id}>
@@ -439,7 +453,7 @@ export default function Chapters() {
                         {chapter.characterIds && chapter.characterIds.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
                             {chapter.characterIds.map(characterId => {
-                              const character = characters.find((c: Character) => c.id === characterId);
+                              const character = Array.isArray(characters) ? characters.find((c: Character) => c.id === characterId) : undefined;
                               return character ? (
                                 <Badge 
                                   key={characterId} 
@@ -460,7 +474,7 @@ export default function Chapters() {
                   </div>
                 ))}
                 
-                {chapters.length === 0 && (
+                {(!Array.isArray(chapters) || chapters.length === 0) && (
                   <div className="text-center py-16">
                     <div className="w-24 h-24 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-6">
                       <List className="w-12 h-12 icon-default" />

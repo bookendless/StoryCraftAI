@@ -36,6 +36,10 @@ export default function Synopsis({ projectId }: SynopsisProps) {
 
   const saveSynopsisMutation = useMutation({
     mutationFn: async (data: Partial<Synopsis>) => {
+      if (!projectId) {
+        throw new Error("プロジェクトIDが見つかりません");
+      }
+      
       if (synopsis && synopsis.id) {
         const response = await apiRequest("PATCH", `/api/synopsis/${synopsis.id}`, data);
         return response.json();
@@ -47,8 +51,19 @@ export default function Synopsis({ projectId }: SynopsisProps) {
         return response.json();
       }
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "synopsis"] });
+      
+      // Save version to history
+      if (synopsisData.content) {
+        try {
+          await apiRequest("POST", `/api/projects/${projectId}/synopsis/versions`, { content: synopsisData.content });
+          queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/synopsis/versions`] });
+        } catch (error) {
+          console.error("Failed to save synopsis version:", error);
+        }
+      }
+      
       toast({
         title: "保存完了",
         description: "あらすじを保存しました。",
