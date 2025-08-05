@@ -22,6 +22,8 @@ export default function Chapters({ projectId }: ChaptersProps) {
   const [totalChapters, setTotalChapters] = useState(8);
   const [structure, setStructure] = useState("kishotenketsu");
   const [estimatedLength, setEstimatedLength] = useState(50000);
+  const [editingChapters, setEditingChapters] = useState<Record<string, any>>({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<Record<string, boolean>>({});
 
   // Fetch data
   const { data: chapters = [], isLoading: chaptersLoading } = useQuery<Chapter[]>({
@@ -214,12 +216,58 @@ export default function Chapters({ projectId }: ChaptersProps) {
     createChapterMutation.mutate(newChapter);
   };
 
-  const updateChapter = (chapterIndex: number, updates: any) => {
+  const updateLocalChapter = (chapterIndex: number, updates: any) => {
     const chapterArray = Array.isArray(chapters) ? chapters : [];
     const chapter = chapterArray[chapterIndex];
     if (chapter) {
-      updateChapterMutation.mutate({ id: chapter.id, ...updates });
+      setEditingChapters(prev => ({
+        ...prev,
+        [chapter.id]: { ...chapter, ...prev[chapter.id], ...updates }
+      }));
+      setHasUnsavedChanges(prev => ({
+        ...prev,
+        [chapter.id]: true
+      }));
     }
+  };
+
+  const saveChapter = (chapterIndex: number) => {
+    const chapterArray = Array.isArray(chapters) ? chapters : [];
+    const chapter = chapterArray[chapterIndex];
+    if (chapter && editingChapters[chapter.id]) {
+      updateChapterMutation.mutate({ 
+        id: chapter.id, 
+        ...editingChapters[chapter.id]
+      });
+      setHasUnsavedChanges(prev => ({
+        ...prev,
+        [chapter.id]: false
+      }));
+    }
+  };
+
+  const resetChapterChanges = (chapterIndex: number) => {
+    const chapterArray = Array.isArray(chapters) ? chapters : [];
+    const chapter = chapterArray[chapterIndex];
+    if (chapter) {
+      setEditingChapters(prev => {
+        const newState = { ...prev };
+        delete newState[chapter.id];
+        return newState;
+      });
+      setHasUnsavedChanges(prev => ({
+        ...prev,
+        [chapter.id]: false
+      }));
+    }
+  };
+
+  const getChapterData = (chapterIndex: number) => {
+    const chapterArray = Array.isArray(chapters) ? chapters : [];
+    const chapter = chapterArray[chapterIndex];
+    if (!chapter) return null;
+    
+    return editingChapters[chapter.id] || chapter;
   };
 
   const removeChapter = (chapterIndex: number) => {
@@ -398,8 +446,8 @@ export default function Chapters({ projectId }: ChaptersProps) {
                         </div>
                         <Input
                           placeholder={`第${index + 1}章のタイトル`}
-                          value={chapter.title}
-                          onChange={(e) => updateChapter(index, { title: e.target.value })}
+                          value={getChapterData(index)?.title || ""}
+                          onChange={(e) => updateLocalChapter(index, { title: e.target.value })}
                           data-testid={`input-chapter-title-${chapter.id}`}
                           className="font-medium flex-1"
                         />
@@ -423,8 +471,8 @@ export default function Chapters({ projectId }: ChaptersProps) {
                     <div className="space-y-3">
                       <Textarea
                         placeholder="章の概要・あらすじ"
-                        value={chapter.summary || ""}
-                        onChange={(e) => updateChapter(index, { summary: e.target.value })}
+                        value={getChapterData(index)?.summary || ""}
+                        onChange={(e) => updateLocalChapter(index, { summary: e.target.value })}
                         data-testid={`textarea-chapter-summary-${chapter.id}`}
                         rows={3}
                         className="resize-none"
@@ -436,8 +484,8 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           <Input
                             type="number"
                             placeholder="5000"
-                            value={chapter.estimatedWords || ""}
-                            onChange={(e) => updateChapter(index, { estimatedWords: parseInt(e.target.value) || 0 })}
+                            value={getChapterData(index)?.estimatedWords || ""}
+                            onChange={(e) => updateLocalChapter(index, { estimatedWords: parseInt(e.target.value) || 0 })}
                             data-testid={`input-chapter-words-${chapter.id}`}
                             className="text-sm"
                           />
@@ -447,8 +495,8 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           <Input
                             type="number"
                             placeholder="20"
-                            value={chapter.estimatedReadingTime || ""}
-                            onChange={(e) => updateChapter(index, { estimatedReadingTime: parseInt(e.target.value) || 0 })}
+                            value={getChapterData(index)?.estimatedReadingTime || ""}
+                            onChange={(e) => updateLocalChapter(index, { estimatedReadingTime: parseInt(e.target.value) || 0 })}
                             data-testid={`input-chapter-time-${chapter.id}`}
                             className="text-sm"
                           />
@@ -460,9 +508,9 @@ export default function Chapters({ projectId }: ChaptersProps) {
                         <Select
                           value=""
                           onValueChange={(characterId) => {
-                            const currentIds = chapter.characterIds || [];
+                            const currentIds = getChapterData(index)?.characterIds || [];
                             if (!currentIds.includes(characterId)) {
-                              updateChapter(index, { 
+                              updateLocalChapter(index, { 
                                 characterIds: [...currentIds, characterId] 
                               });
                             }
@@ -473,7 +521,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           </SelectTrigger>
                           <SelectContent>
                             {Array.isArray(characters) && characters
-                              .filter((char: Character) => !chapter.characterIds?.includes(char.id))
+                              .filter((char: Character) => !getChapterData(index)?.characterIds?.includes(char.id))
                               .map((character: Character) => (
                                 <SelectItem key={character.id} value={character.id}>
                                   {character.name}
@@ -482,17 +530,17 @@ export default function Chapters({ projectId }: ChaptersProps) {
                           </SelectContent>
                         </Select>
                         
-                        {chapter.characterIds && chapter.characterIds.length > 0 && (
+                        {getChapterData(index)?.characterIds && getChapterData(index)?.characterIds.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {chapter.characterIds.map(characterId => {
+                            {getChapterData(index)?.characterIds.map((characterId: string) => {
                               const character = Array.isArray(characters) ? characters.find((c: Character) => c.id === characterId) : undefined;
                               return character ? (
                                 <Badge 
                                   key={characterId} 
                                   variant="secondary" 
                                   className="text-xs cursor-pointer"
-                                  onClick={() => updateChapter(index, {
-                                    characterIds: chapter.characterIds?.filter(id => id !== characterId)
+                                  onClick={() => updateLocalChapter(index, {
+                                    characterIds: getChapterData(index)?.characterIds?.filter((id: string) => id !== characterId)
                                   })}
                                 >
                                   {character.name} ×
@@ -501,6 +549,40 @@ export default function Chapters({ projectId }: ChaptersProps) {
                             })}
                           </div>
                         )}
+                      </div>
+                      
+                      {/* 保存・リセットボタン */}
+                      <div className="flex items-center justify-between pt-3 border-t border-surface-200">
+                        <div className="flex items-center space-x-2">
+                          {hasUnsavedChanges[chapter.id] && (
+                            <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-800">
+                              未保存
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => resetChapterChanges(index)}
+                            disabled={!hasUnsavedChanges[chapter.id]}
+                            data-testid={`button-reset-chapter-${chapter.id}`}
+                            className="text-xs"
+                          >
+                            リセット
+                          </Button>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => saveChapter(index)}
+                            disabled={!hasUnsavedChanges[chapter.id] || updateChapterMutation.isPending}
+                            data-testid={`button-save-chapter-${chapter.id}`}
+                            className="text-xs"
+                            style={{ color: "#1b6e98" }}
+                          >
+                            {updateChapterMutation.isPending ? "保存中..." : "保存"}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
