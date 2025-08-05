@@ -70,9 +70,20 @@ export function ImageUpload({ imageUrl, onImageChange, placeholder = "画像を�
         throw new Error('ファイルのアップロードに失敗しました');
       }
 
-      // URLからオブジェクトパスを抽出
-      const url = new URL(uploadURL);
-      const objectPath = url.pathname;
+      // アップロード完了後、ACLを設定してオブジェクトパスを取得
+      const aclResponse = await fetch('/api/objects/acl', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ imageUrl: uploadURL }),
+      });
+
+      if (!aclResponse.ok) {
+        throw new Error('画像の設定に失敗しました');
+      }
+
+      const { objectPath } = await aclResponse.json();
 
       onImageChange(objectPath);
 

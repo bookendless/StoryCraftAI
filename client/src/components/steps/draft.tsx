@@ -161,7 +161,7 @@ export default function Draft({ projectId }: DraftProps) {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 p-6 overflow-y-auto h-0">
         {!selectedChapter ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-6">

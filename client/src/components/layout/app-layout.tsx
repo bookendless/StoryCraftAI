@@ -17,7 +17,7 @@ export default function AppLayout({ project, children }: AppLayoutProps) {
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {children}
       </div>
     </div>

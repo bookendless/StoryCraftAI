@@ -475,6 +475,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Set object ACL after upload
+  app.post("/api/objects/acl", async (req, res) => {
+    try {
+      const { imageUrl } = req.body;
+      if (!imageUrl) {
+        return res.status(400).json({ error: "imageUrl is required" });
+      }
+
+      const objectPath = objectStorageService.normalizeObjectEntityPath(imageUrl);
+      
+      res.json({ objectPath });
+    } catch (error) {
+      console.error("Error setting object ACL:", error);
+      res.status(500).json({ error: "Failed to set object ACL" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

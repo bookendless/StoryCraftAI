@@ -193,7 +193,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 p-6 overflow-y-auto h-0">
         {!selectedChapter ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -406,7 +406,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
                           <div>
                             <h5 className="text-sm font-medium text-secondary-600 mb-1">主な出来事</h5>
                             <ul className="text-sm text-secondary-700 space-y-1" data-testid={`list-episode-events-${episode.id}`}>
-                              {(episode.events as string[]).map((event, idx) => (
+                              {(episode.events as string[]).map((event: string, idx: number) => (
                                 <li key={idx} className="flex items-start space-x-2">
                                   <span className="text-primary-500 mt-1">•</span>
                                   <span>{event}</span>

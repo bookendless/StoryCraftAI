@@ -132,7 +132,7 @@ export default function Plot({ projectId }: PlotProps) {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 p-6 overflow-y-auto h-0">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Plot Overview */}
           <Card className="elevation-1">
