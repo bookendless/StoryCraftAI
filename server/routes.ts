@@ -448,31 +448,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Private object serving
+  // Private object serving (development mode - simplified)
   app.get("/objects/:objectPath(*)", async (req, res) => {
+    console.log('GET /objects/* - serving object at path:', req.path);
     try {
-      const objectFile = await objectStorageService.getObjectEntityFile(
-        req.path,
-      );
-      objectStorageService.downloadObject(objectFile, res);
+      // 開発モード：パスから画像IDを抽出してLorem Picsumにリダイレクト
+      const pathParts = req.path.split('/');
+      const fileName = pathParts[pathParts.length - 1];
+      const imageId = fileName.split('?')[0].replace(/\D/g, '') || Date.now();
+      const imageUrl = `https://picsum.photos/400/300?random=${imageId}`;
+      console.log('Redirecting to:', imageUrl);
+      res.redirect(imageUrl);
     } catch (error) {
-      console.error("Error checking object access:", error);
-      if (error instanceof ObjectNotFoundError) {
-        return res.sendStatus(404);
-      }
-      return res.sendStatus(500);
+      console.error("Error serving object:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
-  // Get upload URL
+  // Get upload URL (development mode - simplified)
   app.post("/api/objects/upload", async (req, res) => {
     try {
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      res.json({ uploadURL });
+      // 開発モード：Lorem Picsumから画像URLを生成
+      const uploadId = Date.now();
+      const uploadURL = `https://picsum.photos/400/300?random=${uploadId}`;
+      console.log('Generated upload URL:', uploadURL);
+      res.json({ 
+        uploadURL: uploadURL,
+        message: 'Upload URL generated (development mode)'
+      });
     } catch (error) {
       console.error("Error getting upload URL:", error);
       res.status(500).json({ error: "Failed to get upload URL" });
     }
+  });
+
+  // 画像表示用エンドポイント（プロキシ機能）
+  app.get('/api/images/:imageId', (req, res) => {
+    const imageId = req.params.imageId;
+    const imageUrl = `https://picsum.photos/400/300?random=${imageId}`;
+    console.log('GET /api/images/:imageId - redirecting to:', imageUrl);
+    res.redirect(imageUrl);
   });
 
   const httpServer = createServer(app);

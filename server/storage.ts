@@ -76,6 +76,25 @@ export class MemStorage implements IStorage {
     this.chapters = new Map();
     this.episodes = new Map();
     this.drafts = new Map();
+    
+    // テスト用プロジェクトを追加
+    this.initializeTestData();
+  }
+
+  private initializeTestData() {
+    const now = new Date();
+    const testProject: Project = {
+      id: "1",
+      title: "魔法の学園物語",
+      genre: "ファンタジー",
+      description: "現代の学園に隠された魔法の世界を舞台にした冒険物語",
+      imageUrl: "https://picsum.photos/400/300?random=1001",
+      currentStep: 1,
+      progress: 0,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.projects.set("1", testProject);
   }
 
   // Projects

@@ -26,7 +26,18 @@ app.use(express.json());
 
 // データベース接続（環境変数から）
 const DATABASE_URL = process.env.DATABASE_URL;
-let projects = []; // メモリ内ストレージ（簡易実装）
+let projects = [
+  {
+    id: "1",
+    title: "魔法の学園物語",
+    genre: "ファンタジー",
+    description: "現代の学園に隠された魔法の世界を舞台にした冒険物語",
+    imageUrl: "https://picsum.photos/400/300?random=1001",
+    currentStep: 1,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+]; // メモリ内ストレージ（簡易実装）
 
 // 基本的なAPIエンドポイント
 app.get('/api/projects', (req, res) => {
@@ -280,6 +291,27 @@ app.post('/api/ai/generate-plot', (req, res) => {
       message: 'プロットが生成されました（デモ版）'
     });
   }, 1500);
+});
+
+// 画像表示用エンドポイント（プロキシ機能）
+app.get('/api/images/:imageId', (req, res) => {
+  const imageId = req.params.imageId;
+  // Lorem Picsumからの画像をプロキシとして配信
+  const imageUrl = `https://picsum.photos/400/300?random=${imageId}`;
+  console.log('GET /api/images/:imageId - redirecting to:', imageUrl);
+  res.redirect(imageUrl);
+});
+
+// オブジェクトパス用の画像表示
+app.get('/objects/*', (req, res) => {
+  console.log('GET /objects/* - serving object at path:', req.path);
+  // パスから画像IDを抽出してLorem Picsumにリダイレクト
+  const pathParts = req.path.split('/');
+  const fileName = pathParts[pathParts.length - 1];
+  const imageId = fileName.split('?')[0].replace(/\D/g, '') || Date.now();
+  const imageUrl = `https://picsum.photos/400/300?random=${imageId}`;
+  console.log('Redirecting to:', imageUrl);
+  res.redirect(imageUrl);
 });
 
 app.get('/api/health', (req, res) => {
