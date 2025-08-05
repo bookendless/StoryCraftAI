@@ -100,7 +100,7 @@ export default function Plot({ projectId }: PlotProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col min-h-0">
       {/* Header */}
       <header className="bg-surface-50 border-b border-outline/10 px-6 py-4 elevation-1">
         <div className="flex items-center justify-between">
@@ -132,7 +132,7 @@ export default function Plot({ projectId }: PlotProps) {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 overflow-y-auto h-0">
+      <div className="flex-1 p-6 overflow-y-auto min-h-0">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Plot Overview */}
           <Card className="elevation-1">

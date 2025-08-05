@@ -202,7 +202,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
   return (
     <div className="flex-1 flex">
       {/* Main Editor Section */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
         <header className="bg-surface-50 border-b border-outline/10 px-6 py-4 elevation-1">
           <div className="flex items-center justify-between">
@@ -225,7 +225,7 @@ export default function Chapters({ projectId }: ChaptersProps) {
         </header>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-6 overflow-y-auto h-0">
+        <div className="flex-1 p-6 overflow-y-auto min-h-0">
           {/* Chapter Overview */}
           <div className="bg-surface-50 rounded-xl p-6 mb-6 elevation-1">
             <h3 className="text-lg font-medium text-on-surface mb-4">全体構成概要</h3>

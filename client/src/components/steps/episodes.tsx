@@ -168,7 +168,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
   const selectedChapterData = chapters.find(ch => ch.id === selectedChapter);
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col min-h-0">
       {/* Header */}
       <header className="bg-surface-50 border-b border-outline/10 px-6 py-4 elevation-1">
         <div className="flex items-center justify-between">
@@ -193,7 +193,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 overflow-y-auto h-0">
+      <div className="flex-1 p-6 overflow-y-auto min-h-0">
         {!selectedChapter ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-6">
