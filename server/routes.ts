@@ -3,8 +3,11 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertProjectSchema, insertCharacterSchema, insertPlotSchema, 
-  insertSynopsisSchema, insertChapterSchema, insertEpisodeSchema, insertDraftSchema 
+  insertSynopsisSchema, insertChapterSchema, insertEpisodeSchema, insertDraftSchema,
+  synopsisVersions, synopses
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, max } from "drizzle-orm";
 import { 
   generateCharacterSuggestions, generatePlotSuggestion, generateSynopsis,
   generateChapterSuggestions, generateEpisodeSuggestion, generateDraft
@@ -521,6 +524,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error setting object ACL:", error);
       res.status(500).json({ error: "Failed to set object ACL" });
+    }
+  });
+
+  // Synopsis version routes
+  app.get("/api/projects/:projectId/synopsis/versions", async (req, res) => {
+    try {
+      const versions = await db
+        .select()
+        .from(synopsisVersions)
+        .where(eq(synopsisVersions.projectId, req.params.projectId))
+        .orderBy(desc(synopsisVersions.createdAt));
+      
+      res.json(versions);
+    } catch (error) {
+      console.error("Error fetching synopsis versions:", error);
+      res.status(500).json({ error: "Failed to fetch synopsis versions" });
+    }
+  });
+
+  app.post("/api/projects/:projectId/synopsis/versions", async (req, res) => {
+    try {
+      const { content } = req.body;
+      
+      // Get current max version number
+      const [maxVersion] = await db
+        .select({ maxVersion: max(synopsisVersions.version) })
+        .from(synopsisVersions)
+        .where(eq(synopsisVersions.projectId, req.params.projectId));
+
+      const nextVersion = (maxVersion?.maxVersion || 0) + 1;
+
+      // Deactivate all previous versions
+      await db
+        .update(synopsisVersions)
+        .set({ isActive: false })
+        .where(eq(synopsisVersions.projectId, req.params.projectId));
+
+      // Create new version
+      const [newVersion] = await db
+        .insert(synopsisVersions)
+        .values({
+          projectId: req.params.projectId,
+          content,
+          version: nextVersion,
+          isActive: true,
+        })
+        .returning();
+      
+      res.status(201).json(newVersion);
+    } catch (error) {
+      console.error("Error creating synopsis version:", error);
+      res.status(500).json({ error: "Failed to create synopsis version" });
+    }
+  });
+
+  app.post("/api/synopsis/versions/:versionId/restore", async (req, res) => {
+    try {
+      const version = await db
+        .select()
+        .from(synopsisVersions)
+        .where(eq(synopsisVersions.id, req.params.versionId))
+        .limit(1);
+
+      if (!version.length) {
+        return res.status(404).json({ error: "Version not found" });
+      }
+
+      const versionData = version[0];
+
+      // Update the current synopsis with the version content
+      await db
+        .update(synopses)
+        .set({ content: versionData.content })
+        .where(eq(synopses.projectId, versionData.projectId));
+
+      // Set this version as active
+      await db
+        .update(synopsisVersions)
+        .set({ isActive: false })
+        .where(eq(synopsisVersions.projectId, versionData.projectId));
+
+      await db
+        .update(synopsisVersions)
+        .set({ isActive: true })
+        .where(eq(synopsisVersions.id, req.params.versionId));
+      
+      res.json({ message: "Synopsis restored successfully" });
+    } catch (error) {
+      console.error("Error restoring synopsis version:", error);
+      res.status(500).json({ error: "Failed to restore synopsis version" });
     }
   });
 

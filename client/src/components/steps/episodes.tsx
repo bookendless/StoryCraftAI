@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Film, Sparkles, Edit, Trash2, Save, GripVertical, ArrowLeft } from "lucide-react";
+import { Plus, Film, Sparkles, Edit, Trash2, Save, GripVertical } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Episode, Chapter } from "@shared/schema";
@@ -20,8 +19,8 @@ interface EpisodesProps {
 export default function Episodes({ projectId }: EpisodesProps) {
   const { toast } = useToast();
   const [selectedChapter, setSelectedChapter] = useState<string>("");
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEpisode, setEditingEpisode] = useState<Episode | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [newEpisode, setNewEpisode] = useState({
     title: "",
     description: "",
@@ -34,11 +33,11 @@ export default function Episodes({ projectId }: EpisodesProps) {
   });
 
   const { data: chapters = [] } = useQuery<Chapter[]>({
-    queryKey: ["/api/projects", projectId, "chapters"],
+    queryKey: [`/api/projects/${projectId}/chapters`],
   });
 
   const { data: episodes = [], isLoading: episodesLoading } = useQuery<Episode[]>({
-    queryKey: ["/api/chapters", selectedChapter, "episodes"],
+    queryKey: [`/api/chapters/${selectedChapter}/episodes`],
     enabled: !!selectedChapter,
   });
 
@@ -48,12 +47,12 @@ export default function Episodes({ projectId }: EpisodesProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/chapters", selectedChapter, "episodes"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/chapters/${selectedChapter}/episodes`] });
       toast({
         title: "エピソード作成完了",
         description: "新しいエピソードを追加しました。",
       });
-      setDialogOpen(false);
+      setShowCreateForm(false);
       resetForm();
     },
     onError: () => {
@@ -71,10 +70,10 @@ export default function Episodes({ projectId }: EpisodesProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/chapters", selectedChapter, "episodes"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/chapters/${selectedChapter}/episodes`] });
       toast({
-        title: "更新完了",
-        description: "エピソード情報を更新しました。",
+        title: "エピソード更新完了",
+        description: "エピソードを更新しました。",
       });
       setEditingEpisode(null);
     },
@@ -88,13 +87,13 @@ export default function Episodes({ projectId }: EpisodesProps) {
   });
 
   const deleteEpisodeMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/episodes/${id}`);
+    mutationFn: async (episodeId: string) => {
+      await apiRequest("DELETE", `/api/episodes/${episodeId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/chapters", selectedChapter, "episodes"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/chapters/${selectedChapter}/episodes`] });
       toast({
-        title: "削除完了",
+        title: "エピソード削除完了",
         description: "エピソードを削除しました。",
       });
     },
@@ -107,14 +106,14 @@ export default function Episodes({ projectId }: EpisodesProps) {
     },
   });
 
-  const generateEpisodesMutation = useMutation({
+  const generateEpisodeMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("POST", `/api/chapters/${selectedChapter}/episodes/generate`);
       return response.json();
     },
     onSuccess: (suggestions) => {
       toast({
-        title: "AI提案完了",
+        title: "AI生成完了",
         description: `${suggestions.length}個のエピソード案を生成しました。`,
       });
       // Auto-create suggested episodes
@@ -122,7 +121,6 @@ export default function Episodes({ projectId }: EpisodesProps) {
         const episodeData = {
           ...suggestion,
           order: episodes.length + index,
-          events: suggestion.events || []
         };
         createEpisodeMutation.mutate(episodeData);
       });
@@ -130,7 +128,7 @@ export default function Episodes({ projectId }: EpisodesProps) {
     onError: () => {
       toast({
         title: "エラー",
-        description: "AI提案の生成に失敗しました。",
+        description: "AI生成に失敗しました。",
         variant: "destructive",
       });
     },
@@ -165,7 +163,13 @@ export default function Episodes({ projectId }: EpisodesProps) {
     updateEpisodeMutation.mutate(episode);
   };
 
-  const selectedChapterData = chapters.find(ch => ch.id === selectedChapter);
+  // Handle clicking outside form to cancel
+  const handleBackgroundClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setShowCreateForm(false);
+      resetForm();
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -179,13 +183,14 @@ export default function Episodes({ projectId }: EpisodesProps) {
           <div className="flex items-center space-x-3">
             {selectedChapter && (
               <Button
-                onClick={() => generateEpisodesMutation.mutate()}
-                disabled={generateEpisodesMutation.isPending}
+                onClick={() => generateEpisodeMutation.mutate()}
+                disabled={generateEpisodeMutation.isPending}
                 data-testid="button-ai-generate-episodes"
-                className="bg-primary-500 hover:bg-primary-600 text-white"
+                className="bg-primary-500 hover:bg-primary-600"
+                style={{ color: "#1b6e98" }}
               >
                 <Sparkles className="w-4 h-4 mr-2" />
-                {generateEpisodesMutation.isPending ? "AI生成中..." : "AI補完"}
+                {generateEpisodeMutation.isPending ? "AI生成中..." : "AI生成"}
               </Button>
             )}
           </div>
@@ -194,167 +199,92 @@ export default function Episodes({ projectId }: EpisodesProps) {
 
       {/* Main Content */}
       <div className="flex-1 p-6 overflow-y-auto min-h-0">
-        {!selectedChapter ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Film className="w-12 h-12 icon-default" />
-            </div>
-            <h3 className="text-xl font-semibold text-on-surface mb-4">章を選択してください</h3>
-            <p className="icon-muted mb-8 max-w-md mx-auto">
-              エピソードを設計する章を選択してから開始しましょう。
-            </p>
-            
-            {chapters.length === 0 ? (
-              <div className="bg-surface-100 rounded-lg p-6 max-w-md mx-auto">
-                <p className="text-secondary-600 mb-4">まだ章が作成されていません。</p>
-                <Button 
-                  variant="outline"
-                  onClick={() => window.history.back()}
-                  data-testid="button-go-back-chapters"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  章立てに戻る
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                {chapters.map((chapter, index) => (
-                  <Card 
-                    key={chapter.id}
-                    className="cursor-pointer card-hover material-transition elevation-1"
-                    onClick={() => setSelectedChapter(chapter.id)}
-                    data-testid={`card-select-chapter-${chapter.id}`}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white font-bold">{index + 1}</span>
-                        </div>
-                        <CardTitle className="text-base">{chapter.title}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-secondary-500 line-clamp-2">
-                        {chapter.summary || "要旨が設定されていません"}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="max-w-6xl mx-auto">
-            {/* Chapter Header */}
-            <div className="bg-primary-50 rounded-xl p-6 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedChapter("")}
-                    data-testid="button-back-chapter-selection"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    章選択に戻る
-                  </Button>
-                  <div>
-                    <h3 className="text-lg font-medium text-on-surface" data-testid="text-selected-chapter-title">
-                      {selectedChapterData?.title}
-                    </h3>
-                    <p className="text-sm text-secondary-500">
-                      この章のエピソードを設計
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Chapter Selection */}
+          <Card className="elevation-1">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Film className="w-5 h-5 icon-default" />
+                <span>章選択</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="chapterSelect">エピソードを作成する章を選択</Label>
+                  <Select value={selectedChapter} onValueChange={setSelectedChapter}>
+                    <SelectTrigger data-testid="select-chapter">
+                      <SelectValue placeholder="章を選択してください" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {chapters.map((chapter) => (
+                        <SelectItem key={chapter.id} value={chapter.id}>
+                          {chapter.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {selectedChapter && (
+                  <div className="bg-primary-50 rounded-lg p-4">
+                    <p className="text-sm text-primary-700">
+                      選択された章: <strong>{chapters.find(c => c.id === selectedChapter)?.title}</strong>
                     </p>
                   </div>
-                </div>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      data-testid="button-add-episode"
-                      className="bg-primary-500 hover:bg-primary-600 text-white"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      エピソード追加
-                    </Button>
-                  </DialogTrigger>
-                  <EpisodeDialog
-                    episode={newEpisode}
-                    onChange={setNewEpisode}
-                    onSave={handleCreateEpisode}
-                    isLoading={createEpisodeMutation.isPending}
-                    title="新しいエピソードを作成"
-                  />
-                </Dialog>
+                )}
               </div>
-              {selectedChapterData?.summary && (
-                <p className="text-secondary-600 mt-4" data-testid="text-selected-chapter-summary">
-                  {selectedChapterData.summary}
-                </p>
-              )}
-            </div>
+            </CardContent>
+          </Card>
 
-            {episodes.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="w-20 h-20 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Film className="w-10 h-10 icon-default" />
-                </div>
-                <h4 className="text-lg font-semibold text-on-surface mb-4">エピソードを作成しましょう</h4>
-                <p className="icon-muted mb-8 max-w-md mx-auto">
-                  この章の具体的な場面やエピソードを設計して、詳細なストーリーを構築しましょう。
-                </p>
-                <div className="flex items-center justify-center space-x-3">
-                  <Button 
-                    onClick={() => setDialogOpen(true)}
-                    data-testid="button-create-first-episode"
-                    className="bg-primary-500 hover:bg-primary-600 text-white"
+          {selectedChapter && (
+            <Card className="elevation-1">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>エピソード一覧</span>
+                  <Button
+                    onClick={() => setShowCreateForm(true)}
+                    data-testid="button-add-episode"
+                    className="bg-primary-500 hover:bg-primary-600"
+                    style={{ color: "#1b6e98" }}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    エピソード作成
+                    エピソードを追加
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => generateEpisodesMutation.mutate()}
-                    disabled={generateEpisodesMutation.isPending}
-                    data-testid="button-ai-suggest-episodes"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    AI提案
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-medium text-on-surface">
-                    エピソード一覧 ({episodes.length}個)
-                  </h4>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {episodes.map((episode, index) => (
-                    <Card 
-                      key={episode.id} 
-                      className="elevation-1 card-hover material-transition"
-                      data-testid={`card-episode-${episode.id}`}
-                    >
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {episodesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : episodes.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Film className="w-8 h-8 icon-default" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-on-surface mb-2">エピソードがありません</h3>
+                    <p className="text-secondary-600 mb-6">
+                      この章にはまだエピソードが作成されていません。
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {episodes.map((episode, index) => (
+                      <div key={episode.id} className="border rounded-lg p-4 space-y-3" data-testid={`episode-card-${episode.id}`}>
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                              <span className="text-white font-bold text-sm">{index + 1}</span>
+                            <div className="w-8 h-8 bg-secondary-100 rounded-full flex items-center justify-center">
+                              <span className="text-sm font-medium text-secondary-700">{index + 1}</span>
                             </div>
                             <div>
-                              <CardTitle className="text-base" data-testid={`text-episode-title-${episode.id}`}>
+                              <h4 className="font-medium text-on-surface" data-testid={`text-episode-title-${episode.id}`}>
                                 {episode.title}
-                              </CardTitle>
-                              {episode.perspective && (
-                                <Badge variant="outline" className="mt-1">
-                                  {episode.perspective}視点
-                                </Badge>
-                              )}
+                              </h4>
+                              <p className="text-sm text-secondary-600">{episode.mood || "ムード未設定"}</p>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center space-x-2">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -362,13 +292,6 @@ export default function Episodes({ projectId }: EpisodesProps) {
                               data-testid={`button-edit-episode-${episode.id}`}
                             >
                               <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              data-testid={`button-drag-episode-${episode.id}`}
-                            >
-                              <GripVertical className="w-4 h-4" />
                             </Button>
                             <Button
                               variant="ghost"
@@ -381,281 +304,258 @@ export default function Episodes({ projectId }: EpisodesProps) {
                             </Button>
                           </div>
                         </div>
-                      </CardHeader>
-                      
-                      <CardContent className="space-y-3">
+                        
                         {episode.description && (
-                          <div>
-                            <h5 className="text-sm font-medium text-secondary-600 mb-1">概要</h5>
-                            <p className="text-sm text-secondary-700" data-testid={`text-episode-description-${episode.id}`}>
-                              {episode.description}
-                            </p>
-                          </div>
+                          <p className="text-sm text-secondary-700 pl-11">{episode.description}</p>
                         )}
-                        
-                        {episode.setting && (
-                          <div>
-                            <h5 className="text-sm font-medium text-secondary-600 mb-1">場面設定</h5>
-                            <p className="text-sm text-secondary-700" data-testid={`text-episode-setting-${episode.id}`}>
-                              {episode.setting}
-                            </p>
-                          </div>
-                        )}
-                        
-                        {episode.events && Array.isArray(episode.events) && episode.events.length > 0 && (
-                          <div>
-                            <h5 className="text-sm font-medium text-secondary-600 mb-1">主な出来事</h5>
-                            <ul className="text-sm text-secondary-700 space-y-1" data-testid={`list-episode-events-${episode.id}`}>
-                              {(episode.events as string[]).map((event: string, idx: number) => (
-                                <li key={idx} className="flex items-start space-x-2">
-                                  <span className="text-primary-500 mt-1">•</span>
-                                  <span>{event}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                        {episode.mood && (
-                          <div className="pt-2 border-t border-surface-300">
-                            <Badge variant="secondary" className="mr-2">
-                              雰囲気: {episode.mood}
-                            </Badge>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                {/* Add Episode Placeholder */}
-                <div className="border-2 border-dashed border-surface-300 rounded-xl p-6 text-center">
-                  <h5 className="font-medium text-secondary-500 mb-2">新しいエピソードを追加</h5>
-                  <p className="text-sm text-secondary-500 mb-4">AIが場面設計を提案したり、手動でエピソードを作成できます</p>
-                  <div className="flex items-center justify-center space-x-3">
-                    <Button
-                      onClick={() => generateEpisodesMutation.mutate()}
-                      disabled={generateEpisodesMutation.isPending}
-                      data-testid="button-ai-suggest-new-episodes"
-                      className="bg-primary-500 hover:bg-primary-600 text-white"
-                    >
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      AI提案
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setDialogOpen(true)}
-                      data-testid="button-manual-create-episode"
-                    >
-                      手動作成
-                    </Button>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
 
-      {/* Edit Episode Dialog */}
+      {/* Create Episode Form Overlay */}
+      {showCreateForm && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleBackgroundClick}
+        >
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl m-6 max-h-[90vh] overflow-y-auto">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">新しいエピソードを作成</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title">タイトル *</Label>
+                  <Input
+                    id="title"
+                    value={newEpisode.title}
+                    onChange={(e) => setNewEpisode({ ...newEpisode, title: e.target.value })}
+                    data-testid="input-episode-title"
+                    placeholder="エピソードのタイトルを入力"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="description">概要</Label>
+                  <Textarea
+                    id="description"
+                    value={newEpisode.description}
+                    onChange={(e) => setNewEpisode({ ...newEpisode, description: e.target.value })}
+                    data-testid="textarea-episode-description"
+                    rows={3}
+                    placeholder="エピソードの概要を入力"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="perspective">視点</Label>
+                    <Select
+                      value={newEpisode.perspective}
+                      onValueChange={(value) => setNewEpisode({ ...newEpisode, perspective: value })}
+                    >
+                      <SelectTrigger data-testid="select-episode-perspective">
+                        <SelectValue placeholder="視点を選択" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="first-person">一人称</SelectItem>
+                        <SelectItem value="third-person-limited">三人称限定</SelectItem>
+                        <SelectItem value="third-person-omniscient">三人称全知</SelectItem>
+                        <SelectItem value="multiple">多視点</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="mood">ムード・雰囲気</Label>
+                    <Select
+                      value={newEpisode.mood}
+                      onValueChange={(value) => setNewEpisode({ ...newEpisode, mood: value })}
+                    >
+                      <SelectTrigger data-testid="select-episode-mood">
+                        <SelectValue placeholder="ムードを選択" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="tension">緊張感</SelectItem>
+                        <SelectItem value="calm">平穏</SelectItem>
+                        <SelectItem value="dramatic">劇的</SelectItem>
+                        <SelectItem value="mysterious">神秘的</SelectItem>
+                        <SelectItem value="humorous">ユーモラス</SelectItem>
+                        <SelectItem value="romantic">ロマンチック</SelectItem>
+                        <SelectItem value="action">アクション</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="setting">舞台・設定</Label>
+                  <Input
+                    id="setting"
+                    value={newEpisode.setting}
+                    onChange={(e) => setNewEpisode({ ...newEpisode, setting: e.target.value })}
+                    data-testid="input-episode-setting"
+                    placeholder="場所や時間設定"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="dialogue">重要な台詞・会話</Label>
+                  <Textarea
+                    id="dialogue"
+                    value={newEpisode.dialogue}
+                    onChange={(e) => setNewEpisode({ ...newEpisode, dialogue: e.target.value })}
+                    data-testid="textarea-episode-dialogue"
+                    rows={3}
+                    placeholder="印象的な台詞や会話のアイデア"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button
+                  onClick={handleCreateEpisode}
+                  disabled={createEpisodeMutation.isPending || !newEpisode.title.trim()}
+                  data-testid="button-save-episode"
+                  className="bg-primary-500 hover:bg-primary-600"
+                  style={{ color: "#1b6e98" }}
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {createEpisodeMutation.isPending ? "保存中..." : "保存"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Episode Form */}
       {editingEpisode && (
-        <Dialog open={!!editingEpisode} onOpenChange={() => setEditingEpisode(null)}>
-          <EpisodeDialog
-            episode={editingEpisode}
-            onChange={setEditingEpisode}
-            onSave={handleUpdateEpisode}
-            isLoading={updateEpisodeMutation.isPending}
-            title="エピソードを編集"
-          />
-        </Dialog>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setEditingEpisode(null);
+            }
+          }}
+        >
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl m-6 max-h-[90vh] overflow-y-auto">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">エピソードを編集</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-title">タイトル *</Label>
+                  <Input
+                    id="edit-title"
+                    value={editingEpisode.title}
+                    onChange={(e) => setEditingEpisode({ ...editingEpisode, title: e.target.value })}
+                    data-testid="input-edit-episode-title"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-description">概要</Label>
+                  <Textarea
+                    id="edit-description"
+                    value={editingEpisode.description || ""}
+                    onChange={(e) => setEditingEpisode({ ...editingEpisode, description: e.target.value })}
+                    data-testid="textarea-edit-episode-description"
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-perspective">視点</Label>
+                    <Select
+                      value={editingEpisode.perspective || ""}
+                      onValueChange={(value) => setEditingEpisode({ ...editingEpisode, perspective: value })}
+                    >
+                      <SelectTrigger data-testid="select-edit-episode-perspective">
+                        <SelectValue placeholder="視点を選択" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="first-person">一人称</SelectItem>
+                        <SelectItem value="third-person-limited">三人称限定</SelectItem>
+                        <SelectItem value="third-person-omniscient">三人称全知</SelectItem>
+                        <SelectItem value="multiple">多視点</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="edit-mood">ムード・雰囲気</Label>
+                    <Select
+                      value={editingEpisode.mood || ""}
+                      onValueChange={(value) => setEditingEpisode({ ...editingEpisode, mood: value })}
+                    >
+                      <SelectTrigger data-testid="select-edit-episode-mood">
+                        <SelectValue placeholder="ムードを選択" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="tension">緊張感</SelectItem>
+                        <SelectItem value="calm">平穏</SelectItem>
+                        <SelectItem value="dramatic">劇的</SelectItem>
+                        <SelectItem value="mysterious">神秘的</SelectItem>
+                        <SelectItem value="humorous">ユーモラス</SelectItem>
+                        <SelectItem value="romantic">ロマンチック</SelectItem>
+                        <SelectItem value="action">アクション</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-setting">舞台・設定</Label>
+                  <Input
+                    id="edit-setting"
+                    value={editingEpisode.setting || ""}
+                    onChange={(e) => setEditingEpisode({ ...editingEpisode, setting: e.target.value })}
+                    data-testid="input-edit-episode-setting"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-dialogue">重要な台詞・会話</Label>
+                  <Textarea
+                    id="edit-dialogue"
+                    value={editingEpisode.dialogue || ""}
+                    onChange={(e) => setEditingEpisode({ ...editingEpisode, dialogue: e.target.value })}
+                    data-testid="textarea-edit-episode-dialogue"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditingEpisode(null)}
+                  data-testid="button-cancel-edit-episode"
+                >
+                  キャンセル
+                </Button>
+                <Button
+                  onClick={() => handleUpdateEpisode(editingEpisode)}
+                  disabled={updateEpisodeMutation.isPending || !editingEpisode.title?.trim()}
+                  data-testid="button-update-episode"
+                  className="bg-primary-500 hover:bg-primary-600"
+                  style={{ color: "#1b6e98" }}
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {updateEpisodeMutation.isPending ? "更新中..." : "更新"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
-  );
-}
-
-interface EpisodeDialogProps {
-  episode: any;
-  onChange: (episode: any) => void;
-  onSave: (episode: any) => void;
-  isLoading: boolean;
-  title: string;
-}
-
-function EpisodeDialog({ episode, onChange, onSave, isLoading, title }: EpisodeDialogProps) {
-  const [newEvent, setNewEvent] = useState("");
-
-  const addEvent = () => {
-    if (newEvent.trim() && episode) {
-      const events = Array.isArray(episode.events) ? episode.events : [];
-      onChange({ 
-        ...episode, 
-        events: [...events, newEvent.trim()] 
-      });
-      setNewEvent("");
-    }
-  };
-
-  const removeEvent = (index: number) => {
-    if (episode) {
-      const events = Array.isArray(episode.events) ? episode.events : [];
-      onChange({ 
-        ...episode, 
-        events: events.filter((_: any, i: number) => i !== index) 
-      });
-    }
-  };
-
-  return (
-    <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-      </DialogHeader>
-      <div className="space-y-4 pt-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">エピソードタイトル *</Label>
-            <Input
-              id="title"
-              data-testid="input-episode-title"
-              placeholder="例: 運命的な出会い"
-              value={episode?.title || ""}
-              onChange={(e) => episode && onChange({ ...episode, title: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="perspective">視点キャラクター</Label>
-            <Input
-              id="perspective"
-              data-testid="input-episode-perspective"
-              placeholder="例: アリス"
-              value={episode?.perspective || ""}
-              onChange={(e) => episode && onChange({ ...episode, perspective: e.target.value })}
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="description">エピソード概要</Label>
-          <Textarea
-            id="description"
-            data-testid="textarea-episode-description"
-            placeholder="このエピソードで何が起こるかを記述..."
-            value={episode?.description || ""}
-            onChange={(e) => episode && onChange({ ...episode, description: e.target.value })}
-            rows={3}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="setting">場面設定</Label>
-          <Textarea
-            id="setting"
-            data-testid="textarea-episode-setting"
-            placeholder="場所、時間、環境の描写..."
-            value={episode?.setting || ""}
-            onChange={(e) => episode && onChange({ ...episode, setting: e.target.value })}
-            rows={2}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="mood">雰囲気・トーン</Label>
-            <Select 
-              value={episode?.mood || ""} 
-              onValueChange={(value) => episode && onChange({ ...episode, mood: value })}
-            >
-              <SelectTrigger data-testid="select-episode-mood">
-                <SelectValue placeholder="雰囲気を選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="明るい">明るい</SelectItem>
-                <SelectItem value="緊張感">緊張感</SelectItem>
-                <SelectItem value="神秘的">神秘的</SelectItem>
-                <SelectItem value="感動的">感動的</SelectItem>
-                <SelectItem value="コミカル">コミカル</SelectItem>
-                <SelectItem value="シリアス">シリアス</SelectItem>
-                <SelectItem value="ロマンチック">ロマンチック</SelectItem>
-                <SelectItem value="アクション">アクション</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="dialogue">重要な会話</Label>
-            <Textarea
-              id="dialogue"
-              data-testid="textarea-episode-dialogue"
-              placeholder="キーとなる会話やセリフ..."
-              value={episode?.dialogue || ""}
-              onChange={(e) => episode && onChange({ ...episode, dialogue: e.target.value })}
-              rows={2}
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>主な出来事</Label>
-          <div className="space-y-2">
-            <div className="flex space-x-2">
-              <Input
-                placeholder="新しい出来事を追加..."
-                value={newEvent}
-                onChange={(e) => setNewEvent(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && addEvent()}
-                data-testid="input-new-event"
-              />
-              <Button 
-                type="button" 
-                onClick={addEvent}
-                data-testid="button-add-event"
-                variant="outline"
-              >
-                追加
-              </Button>
-            </div>
-            {episode?.events && episode.events.length > 0 && (
-              <div className="border rounded-lg p-3 max-h-32 overflow-y-auto">
-                {episode?.events?.map((event: string, index: number) => (
-                  <div key={index} className="flex items-center justify-between py-1">
-                    <span className="text-sm" data-testid={`text-event-${index}`}>{event}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeEvent(index)}
-                      data-testid={`button-remove-event-${index}`}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="flex justify-end space-x-2 pt-4">
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              onChange(null);
-            }}
-            data-testid="button-cancel-episode"
-          >
-            キャンセル
-          </Button>
-          <Button 
-            onClick={() => onSave(episode)}
-            disabled={isLoading}
-            data-testid="button-save-episode"
-            className="bg-primary-500 hover:bg-primary-600"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isLoading ? "保存中..." : "保存"}
-          </Button>
-        </div>
-      </div>
-    </DialogContent>
   );
 }
