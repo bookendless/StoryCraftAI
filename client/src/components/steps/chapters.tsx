@@ -14,7 +14,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Chapter, Character } from "@shared/schema";
 
 export default function Chapters() {
-  const { projectId } = useParams();
+  const params = useParams();
+  const projectId = params.projectId;
   const { toast } = useToast();
   
   const [totalChapters, setTotalChapters] = useState(8);
@@ -35,14 +36,26 @@ export default function Chapters() {
   // Mutations
   const generateChaptersMutation = useMutation({
     mutationFn: async () => {
+      if (!projectId) {
+        throw new Error("プロジェクトIDが見つかりません");
+      }
       const response = await apiRequest("POST", `/api/projects/${projectId}/chapters/generate`);
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      }
       toast({
         title: "AI生成完了",
         description: "章構成を生成しました。",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "エラー",
+        description: "AI生成に失敗しました。",
+        variant: "destructive",
       });
     },
   });
@@ -111,17 +124,23 @@ export default function Chapters() {
 
   const createChapterMutation = useMutation({
     mutationFn: async (chapterData: any) => {
+      if (!projectId) {
+        throw new Error("プロジェクトIDが見つかりません");
+      }
       const response = await apiRequest("POST", `/api/projects/${projectId}/chapters`, chapterData);
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      }
       toast({
         title: "章作成完了",
         description: "新しい章を追加しました。",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Chapter creation error:", error);
       toast({
         title: "エラー",
         description: "章の作成に失敗しました。",
@@ -136,10 +155,20 @@ export default function Chapters() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      }
       toast({
         title: "章更新完了",
         description: "章を更新しました。",
+      });
+    },
+    onError: (error) => {
+      console.error("Chapter update error:", error);
+      toast({
+        title: "エラー",
+        description: "章の更新に失敗しました。",
+        variant: "destructive",
       });
     },
   });
@@ -149,7 +178,9 @@ export default function Chapters() {
       await apiRequest("DELETE", `/api/chapters/${chapterId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}/chapters`] });
+      }
       toast({
         title: "章削除完了",
         description: "章を削除しました。",

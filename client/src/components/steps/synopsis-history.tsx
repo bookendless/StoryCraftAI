@@ -25,6 +25,19 @@ interface SynopsisHistoryProps {
 
 export function SynopsisHistory({ projectId, isOpen, onClose, onRestore }: SynopsisHistoryProps) {
   const { toast } = useToast();
+  const [expandedVersions, setExpandedVersions] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (versionId: string) => {
+    setExpandedVersions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(versionId)) {
+        newSet.delete(versionId);
+      } else {
+        newSet.add(versionId);
+      }
+      return newSet;
+    });
+  };
   
   const { data: versions = [], isLoading } = useQuery<SynopsisVersion[]>({
     queryKey: ["/api/projects", projectId, "synopsis", "versions"],
@@ -127,14 +140,18 @@ export function SynopsisHistory({ projectId, isOpen, onClose, onRestore }: Synop
                     </div>
                     
                     <div className="bg-white rounded border p-3">
-                      <p className="text-sm text-secondary-700 leading-relaxed">
-                        {version.content.length > 200 
-                          ? `${version.content.substring(0, 200)}...` 
-                          : version.content}
+                      <p className="text-sm text-secondary-700 leading-relaxed whitespace-pre-wrap">
+                        {expandedVersions.has(version.id) || version.content.length <= 200
+                          ? version.content
+                          : `${version.content.substring(0, 200)}...`}
                       </p>
                       {version.content.length > 200 && (
-                        <button className="text-xs text-primary-500 mt-2 hover:underline">
-                          全文を表示
+                        <button 
+                          onClick={() => toggleExpanded(version.id)}
+                          className="text-xs text-primary-500 mt-2 hover:underline"
+                          data-testid={`button-toggle-content-${version.id}`}
+                        >
+                          {expandedVersions.has(version.id) ? '折りたたむ' : '全文を表示'}
                         </button>
                       )}
                     </div>
