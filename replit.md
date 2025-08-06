@@ -11,6 +11,8 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 - **Version History**: Added synopsis version history system to prevent AI overwrites and allow users to restore previous versions
 - **UI Updates**: Updated settings dialog to show new Gemini models, maintained #1b6e98 button text color throughout interface
 - **Null Safety**: Added proper null checking throughout episode and chapter components to prevent runtime errors
+- **Local Deployment**: Complete local PC deployment setup with SQLite database, Ollama local LLM integration, and Electron desktop app packaging
+- **AI Enhancement**: Added character completion functionality and plot structure comparison view with side-by-side AI suggestions
 
 ## User Preferences
 
@@ -34,9 +36,9 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Hot module replacement via Vite middleware integration
 
 ### Data Storage Solutions
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Connection**: Neon Database serverless PostgreSQL
-- **Schema Management**: Drizzle Kit for migrations and schema management
+- **Cloud Database**: PostgreSQL with Drizzle ORM for type-safe database operations (Neon Database serverless)
+- **Local Database**: SQLite with better-sqlite3 for offline standalone deployment
+- **Schema Management**: Drizzle Kit for migrations and schema management with dual configuration support
 - **Data Modeling**: Relational structure with projects containing characters, plots, synopses, chapters, episodes, and drafts
 
 ### Authentication and Authorization
@@ -46,9 +48,10 @@ Preferred communication style: Simple, everyday language.
 ### External Dependencies
 
 #### AI Integration
-- **Gemini API**: Google's latest AI models (gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash, gemini-1.5-flash) for content generation including character suggestions, plot development, synopsis creation, chapter planning, episode design, and draft writing
-- **Content Generation**: Structured prompts in Japanese for culturally appropriate content creation
-- **AI Character Generation**: Now properly saves generated characters to database instead of just displaying suggestions
+- **Cloud AI**: Gemini API with Google's latest AI models (gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash, gemini-1.5-flash) for cloud-based content generation
+- **Local AI**: Ollama integration supporting local LLM models (llama3.2:3b, llama3.2:7b) for offline standalone deployment
+- **Content Generation**: Structured prompts in Japanese for culturally appropriate content creation including character completion, plot structure generation, and synopsis writing
+- **AI Features**: Character field completion, plot structure comparison view, and comprehensive story development assistance
 
 #### Database and Infrastructure
 - **Neon Database**: Serverless PostgreSQL hosting with connection pooling
@@ -56,9 +59,10 @@ Preferred communication style: Simple, everyday language.
 - **Connect-pg-simple**: PostgreSQL session store for Express sessions
 
 #### Development Tools
-- **Replit Integration**: Vite plugins for Replit development environment including error modal and cartographer
-- **ESBuild**: Fast bundling for production builds
-- **TypeScript**: Full type safety across the entire stack
+- **Cloud Development**: Replit Integration with Vite plugins for cloud development environment
+- **Local Development**: Electron framework for desktop application packaging and distribution
+- **Build Tools**: ESBuild for fast bundling, electron-builder for executable file creation
+- **TypeScript**: Full type safety across the entire stack with dual environment support
 
 #### UI and Styling
 - **Radix UI**: Comprehensive set of accessible UI primitives
