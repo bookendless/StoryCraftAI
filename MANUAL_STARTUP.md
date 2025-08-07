@@ -9,7 +9,8 @@
 Set-Location "C:\path\to\your\project"
 $env:NODE_ENV="development"
 $env:VITE_LOCAL="true"
-npx cross-env NODE_ENV=development VITE_LOCAL=true tsx server/index.ts
+$env:DATABASE_URL=""
+npx cross-env NODE_ENV=development VITE_LOCAL=true DATABASE_URL="" tsx server/index.ts
 ```
 
 ### 方法2: コマンドプロンプトを使用
@@ -19,7 +20,8 @@ npx cross-env NODE_ENV=development VITE_LOCAL=true tsx server/index.ts
 cd /d "C:\path\to\your\project"
 set NODE_ENV=development
 set VITE_LOCAL=true
-npx cross-env NODE_ENV=development VITE_LOCAL=true tsx server/index.ts
+set DATABASE_URL=
+npx cross-env NODE_ENV=development VITE_LOCAL=true DATABASE_URL="" tsx server/index.ts
 ```
 
 ### 方法3: デバッグ版バッチファイル

@@ -33,6 +33,12 @@ if not exist "node_modules" (
     npm install
 )
 
+REM Set environment variables
+set NODE_ENV=development
+set PORT=5000
+set VITE_LOCAL=true
+set DATABASE_URL=
+
 REM Start server
 echo Starting development server...
 echo URL will be: http://localhost:5000
@@ -40,7 +46,7 @@ echo.
 echo To stop server: Press Ctrl+C
 echo.
 
-npx cross-env NODE_ENV=development VITE_LOCAL=true tsx server/index.ts
+npx cross-env NODE_ENV=development VITE_LOCAL=true DATABASE_URL="" tsx server/index.ts
 
 REM This should not execute unless server stops
 echo.

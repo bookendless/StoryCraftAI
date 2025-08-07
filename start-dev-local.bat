@@ -30,6 +30,7 @@ REM Set environment for development mode
 set NODE_ENV=development
 set PORT=5000
 set VITE_LOCAL=true
+set DATABASE_URL=
 
 REM Start development server with Vite
 echo Starting development server with Vite...

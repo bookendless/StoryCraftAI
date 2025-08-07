@@ -554,4 +554,6 @@ export class DatabaseStorage implements IStorage {
 }
 
 // Use MemStorage for local development to avoid database connection issues
-export const storage = process.env.VITE_LOCAL === "true" ? new MemStorage() : new DatabaseStorage();
+export const storage = (process.env.VITE_LOCAL === "true" || !process.env.DATABASE_URL) 
+  ? new MemStorage() 
+  : new DatabaseStorage();

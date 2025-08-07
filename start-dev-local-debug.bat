@@ -52,6 +52,7 @@ echo Setting environment variables...
 set NODE_ENV=development
 set PORT=5000
 set VITE_LOCAL=true
+set DATABASE_URL=
 
 REM Start development server
 echo Starting development server with Vite...
