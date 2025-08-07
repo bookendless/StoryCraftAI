@@ -1,7 +1,7 @@
-// 最もシンプルなローカルサーバー（ESModule対応）
-import express from 'express';
-import path from 'path';
-import fs from 'fs';
+// 最もシンプルなローカルサーバー（CommonJS版）
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
 
 console.log('====================================');
 console.log(' Simple Local Server Starting');
@@ -145,10 +145,10 @@ const host = 'localhost'; // Windows対応
 
 app.listen(port, host, () => {
   console.log('');
-  console.log(`🚀 Server running: http://${host}:${port}`);
-  console.log('📦 Mode: Production Build + Memory Storage');
-  console.log('🎯 Features: All basic story creation features available');
-  console.log('🤖 AI: Fallback responses (no API key required)');
+  console.log(`Server running: http://${host}:${port}`);
+  console.log('Mode: Production Build + Memory Storage');
+  console.log('Features: All basic story creation features available');
+  console.log('AI: Fallback responses (no API key required)');
   console.log('');
   console.log('Press Ctrl+C to stop server');
 });
