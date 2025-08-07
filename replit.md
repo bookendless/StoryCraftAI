@@ -12,7 +12,7 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 - **Data Persistence**: Implemented full memory storage with project, character, plot, synopsis, and chapter management
 - **AI Function Restoration**: Added comprehensive AI completion system with Ollama integration and enhanced fallback responses
 - **Manual Startup Guide**: Created detailed MANUAL_STARTUP.md with PowerShell/CMD alternatives for Windows compatibility
-- **Windows 11 Complete Fix**: Created comprehensive Windows startup solutions including PowerShell scripts, complete setup commands, and manual installation guides to resolve all execution issues
+- **Windows 11 Complete Fix**: Resolved ENOTSUP port binding error by implementing Windows-specific localhost host binding instead of 0.0.0.0, created comprehensive startup solutions with PowerShell scripts and manual installation guides
 - **API Endpoint Coverage**: Implemented complete REST API with proper error handling and logging for all features
 - **Local LLM Support**: Full Ollama integration with llama3.2:3b model support and automatic fallback to basic completions
 
