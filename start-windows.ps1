@@ -49,6 +49,7 @@ if ($LASTEXITCODE -ne 0) {
     $env:VITE_LOCAL = "true"
     $env:DATABASE_URL = ""
     $env:PORT = "5000"
+    $env:GEMINI_API_KEY = ""
     
     Write-Host ""
     Write-Host "Starting with tsx..." -ForegroundColor Green
@@ -64,6 +65,7 @@ $env:NODE_ENV = "development"
 $env:VITE_LOCAL = "true"
 $env:DATABASE_URL = ""
 $env:PORT = "5000"
+$env:GEMINI_API_KEY = ""
 
 Write-Host ""
 Write-Host "=====================================" -ForegroundColor Green

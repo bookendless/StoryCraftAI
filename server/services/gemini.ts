@@ -1,10 +1,101 @@
 import { GoogleGenAI } from "@google/genai";
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY environment variable is required");
-}
+// ローカル環境では API キーなしでも動作するように変更
+const hasApiKey = !!process.env.GEMINI_API_KEY;
+const genAI = hasApiKey ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! }) : null;
 
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// API キー無しの場合のフォールバック関数
+function createFallbackResponse(type: string): any {
+  console.log(`ローカル環境: GEMINI_API_KEY未設定のため${type}にフォールバック応答を使用`);
+  
+  switch (type) {
+    case 'character':
+      return [{
+        name: "主人公",
+        age: 20,
+        occupation: "学生",
+        personality: ["勇敢", "優しい", "好奇心旺盛"],
+        background: "ごく普通の学生だったが、ある日不思議な力に目覚める",
+        motivation: "仲間を守り、世界の謎を解き明かすこと",
+        relationships: "信頼できる仲間たちと協力",
+        notes: "ローカル環境での基本キャラクター"
+      }];
+    
+    case 'character_completion':
+      return {
+        description: "魅力的で個性豊かなキャラクター",
+        personality: "誠実で行動力があり、困っている人を放っておけない性格",
+        background: "平凡な日常を送っていたが、運命的な出会いをきっかけに特別な世界に足を踏み入れる",
+        role: "物語の中心となる重要な人物",
+        affiliation: "正義の組織または仲間グループ"
+      };
+    
+    case 'plot':
+      return {
+        theme: "成長と冒険",
+        setting: "現代の日本を舞台とした異世界もの",
+        hook: "平凡な日常に突如現れる非日常的な出来事",
+        opening: "主人公の日常描写と運命を変える出会い",
+        development: "新たな世界での試練と仲間との出会い",
+        climax: "最大の敵との対決と真実の発覚",
+        conclusion: "成長した主人公と平和になった世界"
+      };
+    
+    case 'synopsis':
+      return "平凡な学生だった主人公が、ある日不思議な力を持つ者たちの世界に巻き込まれる。初めは戸惑いながらも、持ち前の正義感と勇気で仲間たちと共に困難に立ち向かう。様々な試練を乗り越えながら成長していく主人公は、やがて世界を脅かす大きな謎と対峙することになる。友情、成長、そして希望を描いた心温まる物語。";
+    
+    case 'chapters':
+      return Array.from({length: 10}, (_, i) => ({
+        title: `第${i + 1}章`,
+        summary: `第${i + 1}章では物語が${i === 0 ? '始まり' : i < 5 ? '展開し' : i < 8 ? '盛り上がり' : '結末に向かい'}ます`,
+        keyEvents: [`第${i + 1}章の重要な出来事`],
+        structure: i === 0 ? "introduction" : i === 9 ? "resolution" : "rising_action",
+        estimatedWords: 3000,
+        estimatedReadingTime: 10,
+        notes: "ローカル環境での基本構成"
+      }));
+    
+    case 'episodes':
+      return [{
+        title: "新たな出会い",
+        description: "主人公が重要な人物と出会い、物語が動き出す",
+        setting: "学校の屋上、夕暮れ時",
+        events: ["偶然の出会い", "重要な情報の開示", "新たな決意"],
+        mood: "神秘的",
+        perspective: "主人公",
+        dialogue: "「君にしかできないことがある」",
+        notes: "物語の転換点となる重要なエピソード"
+      }];
+    
+    case 'draft':
+      return `夕日が校舎に長い影を落とす頃、私は屋上にいた。
+
+いつもの静かな放課後のはずだった。それなのに、今日は何かが違っていた。空気が重く、まるで嵐の前のような緊張感が漂っている。
+
+「やっと見つけた」
+
+背後からの声に振り返ると、見慣れない制服を着た少女が立っていた。銀色の髪が風になびき、青い瞳が私をじっと見つめている。
+
+「君が、選ばれた人ね」
+
+選ばれた？何のことだろう。私は首を振った。
+
+「人違いじゃないでしょうか。私はただの—」
+
+「ただの学生じゃない。君には特別な力がある」
+
+少女はゆっくりと近づいてくる。その時、私の胸の奥で何かが熱くなった。まるで眠っていた何かが目を覚ましたみたいに。
+
+「この力...何ですか？」
+
+「それが君の運命よ。世界を救う力」
+
+夕日が二人を包み込む中、私の新しい人生が始まろうとしていた。`;
+    
+    default:
+      return null;
+  }
+}
 
 export async function generateCharacterSuggestionsWithGemini(
   projectTitle: string,
@@ -12,6 +103,11 @@ export async function generateCharacterSuggestionsWithGemini(
   targetAudience: string,
   numberOfCharacters: number = 3
 ): Promise<any[]> {
+  // API キーなしの場合はフォールバック応答を返す
+  if (!hasApiKey || !genAI) {
+    return createFallbackResponse('character');
+  }
+
   try {
     const prompt = `
 あなたは創作支援AIです。以下の条件に基づいて魅力的なキャラクターを${numberOfCharacters}人提案してください。
@@ -74,6 +170,11 @@ export async function completeCharacterWithGemini(
   character: any,
   project: any
 ): Promise<any> {
+  // API キーなしの場合はフォールバック応答を返す
+  if (!hasApiKey || !genAI) {
+    return createFallbackResponse('character_completion');
+  }
+
   try {
     const prompt = `
 あなたは創作支援AIです。以下のキャラクターの空欄部分を補完してください。
@@ -141,6 +242,11 @@ export async function generatePlotSuggestionWithGemini(
   genre: string,
   characters: any[]
 ): Promise<any> {
+  // API キーなしの場合はフォールバック応答を返す
+  if (!hasApiKey || !genAI) {
+    return createFallbackResponse('plot');
+  }
+
   try {
     const characterNames = characters.map(c => c.name).join(", ");
     
@@ -205,6 +311,11 @@ export async function generateSynopsisWithGemini(
   plot: any,
   characters: any[]
 ): Promise<string> {
+  // API キーなしの場合はフォールバック応答を返す
+  if (!hasApiKey || !genAI) {
+    return createFallbackResponse('synopsis');
+  }
+
   try {
     const characterNames = characters.map(c => c.name).join(", ");
     
@@ -246,6 +357,11 @@ export async function generateChapterSuggestionsWithGemini(
   synopsis: string,
   targetChapters: number = 10
 ): Promise<any[]> {
+  // API キーなしの場合はフォールバック応答を返す
+  if (!hasApiKey || !genAI) {
+    return createFallbackResponse('chapters');
+  }
+
   try {
     const prompt = `
 あなたは創作支援AIです。以下の情報に基づいて章構成を${targetChapters}章分提案してください。
@@ -315,6 +431,11 @@ export async function generateEpisodeSuggestionWithGemini(
   chapterSummary: string,
   characters: any[]
 ): Promise<any[]> {
+  // API キーなしの場合はフォールバック応答を返す
+  if (!hasApiKey || !genAI) {
+    return createFallbackResponse('episodes');
+  }
+
   try {
     const characterNames = characters.map(c => c.name).join(", ");
     
@@ -383,6 +504,11 @@ export async function generateDraftWithGemini(
   characters: any[],
   style: string = "小説"
 ): Promise<string> {
+  // API キーなしの場合はフォールバック応答を返す
+  if (!hasApiKey || !genAI) {
+    return createFallbackResponse('draft');
+  }
+
   try {
     const characterNames = characters.map(c => c.name).join(", ");
     const episodeSummaries = episodes.map(ep => `- ${ep.title}: ${ep.description}`).join("\n");
