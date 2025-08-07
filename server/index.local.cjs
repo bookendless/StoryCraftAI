@@ -33,6 +33,9 @@ class SimpleStorage {
     this.projects = new Map();
     this.characters = new Map();
     this.plots = new Map();
+    this.synopses = new Map();
+    this.chapters = new Map();
+    this.episodes = new Map();
     this.nextId = 1;
   }
 
@@ -91,6 +94,18 @@ class SimpleStorage {
       const plot = this.plots.get(plotId);
       if (plot && plot.projectId === id) {
         this.plots.delete(plotId);
+      }
+    });
+    Array.from(this.synopses.keys()).forEach(synopsisId => {
+      const synopsis = this.synopses.get(synopsisId);
+      if (synopsis && synopsis.projectId === id) {
+        this.synopses.delete(synopsisId);
+      }
+    });
+    Array.from(this.chapters.keys()).forEach(chapterId => {
+      const chapter = this.chapters.get(chapterId);
+      if (chapter && chapter.projectId === id) {
+        this.chapters.delete(chapterId);
       }
     });
   }
@@ -174,6 +189,78 @@ class SimpleStorage {
       updatedAt: new Date().toISOString(),
     };
     this.plots.set(id, updated);
+    return updated;
+  }
+
+  // Synopses
+  getSynopsis(projectId) {
+    return Array.from(this.synopses.values()).find(synopsis => synopsis.projectId === projectId);
+  }
+
+  createSynopsis(synopsisData) {
+    const synopsis = {
+      id: this.generateId(),
+      content: synopsisData.content || '',
+      tone: synopsisData.tone || '',
+      style: synopsisData.style || '',
+      projectId: synopsisData.projectId,
+      version: synopsisData.version || 1,
+      isActive: synopsisData.isActive !== false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.synopses.set(synopsis.id, synopsis);
+    return synopsis;
+  }
+
+  updateSynopsis(id, synopsisData) {
+    const existing = this.synopses.get(id);
+    if (!existing) throw new Error('Synopsis not found');
+    
+    const updated = {
+      ...existing,
+      ...synopsisData,
+      updatedAt: new Date().toISOString(),
+    };
+    this.synopses.set(id, updated);
+    return updated;
+  }
+
+  // Chapters
+  getChapters(projectId) {
+    return Array.from(this.chapters.values())
+      .filter(chapter => chapter.projectId === projectId)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  createChapter(chapterData) {
+    const chapter = {
+      id: this.generateId(),
+      title: chapterData.title || '',
+      summary: chapterData.summary || '',
+      structure: chapterData.structure || 'ki',
+      estimatedWords: chapterData.estimatedWords || 0,
+      estimatedReadingTime: chapterData.estimatedReadingTime || 0,
+      characterIds: chapterData.characterIds || [],
+      order: chapterData.order || 0,
+      projectId: chapterData.projectId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.chapters.set(chapter.id, chapter);
+    return chapter;
+  }
+
+  updateChapter(id, chapterData) {
+    const existing = this.chapters.get(id);
+    if (!existing) throw new Error('Chapter not found');
+    
+    const updated = {
+      ...existing,
+      ...chapterData,
+      updatedAt: new Date().toISOString(),
+    };
+    this.chapters.set(id, updated);
     return updated;
   }
 }
@@ -445,6 +532,151 @@ app.post("/api/projects/:projectId/plot/generate", (req, res) => {
   }
 });
 
+// API Routes - Synopsis
+app.get("/api/projects/:projectId/synopsis", (req, res) => {
+  try {
+    const synopsis = storage.getSynopsis(req.params.projectId);
+    res.json(synopsis);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post("/api/projects/:projectId/synopsis", (req, res) => {
+  try {
+    const synopsisData = {
+      ...req.body,
+      projectId: req.params.projectId
+    };
+    const synopsis = storage.createSynopsis(synopsisData);
+    res.status(201).json(synopsis);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.patch("/api/synopsis/:id", (req, res) => {
+  try {
+    const synopsis = storage.updateSynopsis(req.params.id, req.body);
+    res.json(synopsis);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// API Routes - Chapters
+app.get("/api/projects/:projectId/chapters", (req, res) => {
+  try {
+    const chapters = storage.getChapters(req.params.projectId);
+    res.json(chapters);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post("/api/projects/:projectId/chapters", (req, res) => {
+  try {
+    const chapterData = {
+      ...req.body,
+      projectId: req.params.projectId
+    };
+    const chapter = storage.createChapter(chapterData);
+    res.status(201).json(chapter);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.patch("/api/chapters/:id", (req, res) => {
+  try {
+    const chapter = storage.updateChapter(req.params.id, req.body);
+    res.json(chapter);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Synopsis generation
+app.post("/api/projects/:projectId/synopsis/generate", (req, res) => {
+  try {
+    const project = storage.getProject(req.params.projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    const characters = storage.getCharacters(req.params.projectId);
+    const plot = storage.getPlot(req.params.projectId);
+    
+    // 簡易あらすじ生成
+    const characterNames = characters.map(c => c.name).join('、') || '主人公';
+    const setting = plot?.setting || '現代日本';
+    
+    const generatedContent = `${setting}を舞台に、${characterNames}が繰り広げる${project.genre}の物語。${plot?.theme || 'ドラマチックな展開'}を通じて、登場人物たちは成長し、新たな絆を築いていく。${plot?.hook || '予想外の出来事'}から始まる物語は、${plot?.climax || '重要な決断の瞬間'}を経て、${plot?.conclusion || '希望に満ちた結末'}へと向かう。`;
+
+    res.json({
+      content: generatedContent,
+      tone: "warm",
+      style: "narrative"
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Ollama integration
+app.post("/api/ai/complete", async (req, res) => {
+  try {
+    const { prompt, type = "general" } = req.body;
+    
+    // Check Ollama connection
+    const ollamaConnected = await checkOllamaConnection();
+    
+    if (ollamaConnected) {
+      try {
+        const response = await fetch('http://localhost:11434/api/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'llama3.2:3b',
+            prompt: prompt,
+            stream: false
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return res.json({ completion: data.response || "補完に失敗しました" });
+        }
+      } catch (error) {
+        console.error("Ollama error:", error);
+      }
+    }
+    
+    // Fallback to basic completion
+    let completion = "";
+    switch (type) {
+      case "character":
+        completion = "個性的で魅力的なキャラクター特徴を持ち、物語に重要な役割を果たします。";
+        break;
+      case "plot":
+        completion = "興味深い展開と感動的なクライマックスを含む、読者を引き込む物語構造です。";
+        break;
+      case "synopsis":
+        completion = "魅力的な設定と登場人物が織りなす、感動的で印象深い物語です。";
+        break;
+      default:
+        completion = "創造的で興味深い内容を提供します。";
+    }
+    
+    res.json({ completion });
+  } catch (error) {
+    console.error("AI completion error:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Serve React app for all other routes
 app.get('*', (req, res) => {
   const indexPaths = [
@@ -481,15 +713,19 @@ server.listen(port, '0.0.0.0', () => {
   console.log(`📊 サンプルプロジェクト: ${storage.getProjects().length}個`);
   console.log('');
   
+  console.log('終了するには Ctrl+C を押してください。');
+  
   // Windows用：ブラウザ自動起動（3秒後）
   if (process.platform === 'win32') {
     console.log('3秒後にブラウザが自動で開きます...');
     setTimeout(() => {
-      require('child_process').exec(`start http://localhost:${port}`);
+      require('child_process').exec(`start http://localhost:${port}`, (error) => {
+        if (error) {
+          console.log('手動でブラウザを開いてください: http://localhost:' + port);
+        }
+      });
     }, 3000);
   }
-  
-  console.log('終了するには Ctrl+C を押してください。');
 });
 
 // エラーハンドリング
@@ -507,14 +743,18 @@ server.on('error', (err) => {
       console.log(`📊 サンプルプロジェクト: ${storage.getProjects().length}個`);
       console.log('');
       
+      console.log('終了するには Ctrl+C を押してください。');
+      
       if (process.platform === 'win32') {
         console.log('3秒後にブラウザが自動で開きます...');
         setTimeout(() => {
-          require('child_process').exec(`start http://localhost:${newPort}`);
+          require('child_process').exec(`start http://localhost:${newPort}`, (error) => {
+            if (error) {
+              console.log('手動でブラウザを開いてください: http://localhost:' + newPort);
+            }
+          });
         }, 3000);
       }
-      
-      console.log('終了するには Ctrl+C を押してください。');
     });
   } else {
     console.error('サーバーエラー:', err);
