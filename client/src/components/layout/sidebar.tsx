@@ -54,6 +54,10 @@ export default function Sidebar({ project, collapsed, onToggle }: SidebarProps) 
   const handleStepClick = (stepId: number) => {
     if (stepId <= project.currentStep || stepId === project.currentStep + 1) {
       updateStepMutation.mutate(stepId);
+      // Force navigate after state update
+      setTimeout(() => {
+        setLocation(`/project/${project.id}`);
+      }, 100);
     }
   };
 

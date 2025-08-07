@@ -269,21 +269,41 @@ class SimpleStorage {
 const storage = new SimpleStorage();
 
 // デモデータの作成（初回起動時）
+console.log('プロジェクト作成: サンプルプロジェクト');
 if (storage.getProjects().length === 0) {
   const demoProject = storage.createProject({
     title: 'サンプルプロジェクト',
     genre: '現代小説',
-    description: 'AIストーリービルダーの使い方を学ぶためのサンプルプロジェクトです。'
+    description: 'AIストーリービルダーの使い方を学ぶためのサンプルプロジェクトです。',
+    currentStep: 1,
+    progress: 0
   });
   
-  storage.createCharacter({
+  const demoCharacter = storage.createCharacter({
     name: '田中太郎',
     description: '平凡な会社員だが、内に秘めた情熱を持っている',
     personality: '真面目で責任感が強い',
+    background: '東京で働く29歳のサラリーマン',
     role: '主人公',
+    affiliation: '',
     projectId: demoProject.id,
     order: 0
   });
+  
+  // プロットも初期化
+  const demoPlot = storage.createPlot({
+    projectId: demoProject.id,
+    theme: '成長と自己発見',
+    setting: '現代の東京',
+    structure: 'kishotenketsu',
+    hook: '突然の転職の誘い',
+    opening: '普通の毎日を送る会社員',
+    development: '新しい環境での挑戦',
+    climax: '重要な決断の瞬間',
+    conclusion: '新たな自分の発見'
+  });
+  
+  console.log(`サンプルプロジェクト作成完了: ${demoProject.id}`);
 }
 
 // Ollama接続確認
@@ -307,13 +327,19 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // CORS設定（ローカル環境用）
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') {
     res.sendStatus(200);
   } else {
     next();
   }
+});
+
+// Request logging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
 });
 
 // Static files - 複数のパスを試行
@@ -342,22 +368,11 @@ if (clientPath) {
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   const ollamaConnected = await checkOllamaConnection();
-  
   res.json({
     status: 'ok',
-    environment: 'local',
-    database: 'memory',
-    storage: 'simple',
-    dataPath: getDataPath(),
-    ollama: {
-      connected: ollamaConnected,
-      models: ollamaConnected ? ['llama3.2:3b'] : []
-    },
-    stats: {
-      projects: storage.getProjects().length,
-      characters: storage.characters.size,
-      plots: storage.plots.size
-    }
+    storage: 'memory',
+    ollama: ollamaConnected,
+    projects: storage.getProjects().length
   });
 });
 
@@ -367,6 +382,7 @@ app.get("/api/projects", (req, res) => {
     const projects = storage.getProjects();
     res.json(projects);
   } catch (error) {
+    console.error("Error fetching projects:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -379,6 +395,7 @@ app.get("/api/projects/:id", (req, res) => {
     }
     res.json(project);
   } catch (error) {
+    console.error("Error fetching project:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -388,6 +405,7 @@ app.post("/api/projects", (req, res) => {
     const project = storage.createProject(req.body);
     res.status(201).json(project);
   } catch (error) {
+    console.error("Error creating project:", error);
     res.status(400).json({ message: error.message });
   }
 });
@@ -397,6 +415,7 @@ app.patch("/api/projects/:id", (req, res) => {
     const project = storage.updateProject(req.params.id, req.body);
     res.json(project);
   } catch (error) {
+    console.error("Error updating project:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -406,6 +425,7 @@ app.delete("/api/projects/:id", (req, res) => {
     storage.deleteProject(req.params.id);
     res.status(204).send();
   } catch (error) {
+    console.error("Error deleting project:", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -623,16 +643,18 @@ app.post("/api/projects/:projectId/synopsis/generate", (req, res) => {
   }
 });
 
-// Ollama integration
+// Ollama integration and AI completion
 app.post("/api/ai/complete", async (req, res) => {
   try {
     const { prompt, type = "general" } = req.body;
+    console.log(`AI completion request: ${type}`);
     
     // Check Ollama connection
     const ollamaConnected = await checkOllamaConnection();
     
     if (ollamaConnected) {
       try {
+        console.log("Using Ollama for AI completion");
         const response = await fetch('http://localhost:11434/api/generate', {
           method: 'POST',
           headers: {
@@ -647,6 +669,7 @@ app.post("/api/ai/complete", async (req, res) => {
         
         if (response.ok) {
           const data = await response.json();
+          console.log("Ollama response received");
           return res.json({ completion: data.response || "補完に失敗しました" });
         }
       } catch (error) {
@@ -654,20 +677,30 @@ app.post("/api/ai/complete", async (req, res) => {
       }
     }
     
-    // Fallback to basic completion
+    console.log("Using fallback AI completion");
+    // Enhanced fallback completions
     let completion = "";
     switch (type) {
       case "character":
-        completion = "個性的で魅力的なキャラクター特徴を持ち、物語に重要な役割を果たします。";
+        completion = "独特な個性と深い内面を持つ魅力的なキャラクター。読者に強い印象を残し、物語の展開に重要な役割を果たします。感情豊かで成長性があり、他のキャラクターとの関係性も興味深く描かれます。";
         break;
       case "plot":
-        completion = "興味深い展開と感動的なクライマックスを含む、読者を引き込む物語構造です。";
+        completion = "読者を引き込む魅力的な物語構造。予期せぬ展開と感動的なクライマックスを含み、登場人物の成長と変化が丁寧に描かれます。テーマ性も深く、読み終わった後も余韻の残る作品となります。";
         break;
       case "synopsis":
-        completion = "魅力的な設定と登場人物が織りなす、感動的で印象深い物語です。";
+        completion = "心に響く感動的な物語。魅力的な設定と個性豊かな登場人物が織りなす、読者の心を掴んで離さない作品です。普遍的なテーマを扱いながらも、独自性のある展開で新鮮な読書体験を提供します。";
+        break;
+      case "description":
+        completion = "詳細で生き生きとした描写。読者が場面を鮮明に想像できるような具体的で魅力的な内容です。";
+        break;
+      case "personality":
+        completion = "多面的で魅力的な性格。複雑さと深みを持ちながらも親しみやすく、読者が感情移入できるキャラクターです。";
+        break;
+      case "background":
+        completion = "興味深い過去の経歴。現在の行動や性格に影響を与える重要な体験や出来事を含んだ背景設定です。";
         break;
       default:
-        completion = "創造的で興味深い内容を提供します。";
+        completion = "創造性に富み、読者の興味を引く魅力的な内容。想像力をかき立て、物語に深みを与える要素です。";
     }
     
     res.json({ completion });
@@ -676,6 +709,76 @@ app.post("/api/ai/complete", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+// Character AI completion
+app.post("/api/projects/:projectId/characters/:characterId/complete", async (req, res) => {
+  try {
+    const { field, currentValue } = req.body;
+    console.log(`Character completion request: ${field}`);
+    
+    let prompt = "";
+    let type = "character";
+    
+    switch (field) {
+      case "description":
+        prompt = `キャラクターの外見や第一印象について、以下の内容を補完してください：${currentValue || "新しいキャラクター"}`;
+        type = "description";
+        break;
+      case "personality":
+        prompt = `キャラクターの性格について、以下の内容を補完してください：${currentValue || ""}`;
+        type = "personality";
+        break;
+      case "background":
+        prompt = `キャラクターの背景や過去について、以下の内容を補完してください：${currentValue || ""}`;
+        type = "background";
+        break;
+      default:
+        prompt = `キャラクターの${field}について補完してください：${currentValue || ""}`;
+    }
+    
+    const completion = await generateAICompletion(prompt, type);
+    res.json({ completion });
+  } catch (error) {
+    console.error("Character completion error:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Helper function for AI completion
+async function generateAICompletion(prompt, type) {
+  const ollamaConnected = await checkOllamaConnection();
+  
+  if (ollamaConnected) {
+    try {
+      const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'llama3.2:3b',
+          prompt: prompt,
+          stream: false
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.response || "補完に失敗しました";
+      }
+    } catch (error) {
+      console.error("Ollama error:", error);
+    }
+  }
+  
+  // Fallback completions
+  const fallbacks = {
+    description: "印象的な外見と存在感を持つ人物。特徴的な服装や表情があり、一度見たら忘れられない魅力を放っています。",
+    personality: "複雑で多面的な性格。表面的には見えない深い内面があり、状況に応じて異なる一面を見せる興味深いキャラクターです。",
+    background: "興味深い過去を持つ人物。これまでの経験が現在の行動や考え方に大きな影響を与えており、物語に深みを加える要素を持っています。",
+    character: "魅力的で個性的なキャラクター。読者の心に残る印象深い人物として、物語に重要な役割を果たします。"
+  };
+  
+  return fallbacks[type] || fallbacks.character;
+}
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {

@@ -6,14 +6,14 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 
 ## Recent Changes (January 2025)
 
-- **AI Migration**: Migrated all AI functions from OpenAI to Gemini API with support for models: gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash, gemini-1.5-flash
-- **Bug Fixes**: Resolved critical issues including episode cancellation crashes, chapters scrolling problems, and character generation not saving properly
-- **Version History**: Added synopsis version history system to prevent AI overwrites and allow users to restore previous versions
-- **UI Updates**: Updated settings dialog to show new Gemini models, maintained #1b6e98 button text color throughout interface
-- **Null Safety**: Added proper null checking throughout episode and chapter components to prevent runtime errors
-- **Local Deployment**: Complete local PC deployment setup with SQLite database, Ollama local LLM integration, and Electron desktop app packaging
-- **AI Enhancement**: Added character completion functionality and plot structure comparison view with side-by-side AI suggestions
-- **Windows 11 Compatibility**: Fixed ES module vs CommonJS conflicts, created Windows-compatible batch files, and implemented memory storage fallback for reliable local deployment
+- **Windows 11 Complete Fix**: Resolved all character encoding issues with start-local-simple.bat (English-only messages)
+- **Local Server Reconstruction**: Completely rebuilt server/index.local.cjs with proper API routing, memory storage, and AI integration
+- **Navigation System Repair**: Fixed sidebar navigation functionality with proper step transitions and project state management
+- **Data Persistence**: Implemented full memory storage with project, character, plot, synopsis, and chapter management
+- **AI Function Restoration**: Added comprehensive AI completion system with Ollama integration and enhanced fallback responses
+- **Manual Startup Guide**: Created detailed MANUAL_STARTUP.md with PowerShell/CMD alternatives for Windows compatibility
+- **API Endpoint Coverage**: Implemented complete REST API with proper error handling and logging for all features
+- **Local LLM Support**: Full Ollama integration with llama3.2:3b model support and automatic fallback to basic completions
 
 ## User Preferences
 

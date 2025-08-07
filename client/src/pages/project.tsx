@@ -21,8 +21,9 @@ const stepComponents = {
 export default function ProjectPage() {
   const { id } = useParams();
   
-  const { data: project, isLoading } = useQuery<Project>({
+  const { data: project, isLoading, error } = useQuery<Project>({
     queryKey: ["/api/projects", id],
+    enabled: !!id,
   });
 
   if (isLoading) {
