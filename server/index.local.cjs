@@ -495,8 +495,27 @@ server.listen(port, '0.0.0.0', () => {
 // エラーハンドリング
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.log(`ポート ${port} は使用中です。ポート ${port + 1} で再試行...`);
-    server.listen(port + 1, '0.0.0.0');
+    const newPort = port + 1;
+    console.log(`ポート ${port} は使用中です。ポート ${newPort} で再試行...`);
+    server.listen(newPort, '0.0.0.0', () => {
+      console.log('');
+      console.log('🚀 AIストーリービルダー（ローカル版）が起動しました！');
+      console.log(`📱 アプリケーション: http://localhost:${newPort}`);
+      console.log(`💾 データベース: メモリストレージ`);
+      console.log(`🤖 AI: 基本補完機能 + Ollama対応`);
+      console.log(`🖥️ プラットフォーム: ${process.platform}`);
+      console.log(`📊 サンプルプロジェクト: ${storage.getProjects().length}個`);
+      console.log('');
+      
+      if (process.platform === 'win32') {
+        console.log('3秒後にブラウザが自動で開きます...');
+        setTimeout(() => {
+          require('child_process').exec(`start http://localhost:${newPort}`);
+        }, 3000);
+      }
+      
+      console.log('終了するには Ctrl+C を押してください。');
+    });
   } else {
     console.error('サーバーエラー:', err);
     process.exit(1);

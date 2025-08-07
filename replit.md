@@ -13,6 +13,7 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 - **Null Safety**: Added proper null checking throughout episode and chapter components to prevent runtime errors
 - **Local Deployment**: Complete local PC deployment setup with SQLite database, Ollama local LLM integration, and Electron desktop app packaging
 - **AI Enhancement**: Added character completion functionality and plot structure comparison view with side-by-side AI suggestions
+- **Windows 11 Compatibility**: Fixed ES module vs CommonJS conflicts, created Windows-compatible batch files, and implemented memory storage fallback for reliable local deployment
 
 ## User Preferences
 
