@@ -1,121 +1,95 @@
-# 手動起動ガイド（Windows 11対応）
+# 手動起動ガイド - Windows 11対応
 
-## 文字化け問題が発生する場合
+## バッチファイルが閉じてしまう場合の解決方法
 
-Windows 11でバッチファイルが文字化けする場合は、以下の方法で手動起動してください。
+### 方法1: PowerShellを使用（推奨）
 
-### 方法1: PowerShellから起動（推奨）
+```powershell
+# PowerShellを管理者として実行
+Set-Location "C:\path\to\your\project"
+$env:NODE_ENV="development"
+$env:VITE_LOCAL="true"
+npx cross-env NODE_ENV=development VITE_LOCAL=true tsx server/index.ts
+```
 
-1. **フォルダ内でPowerShellを開く**
-   - フォルダ内で `Shift + 右クリック`
-   - `PowerShellウィンドウをここで開く` を選択
+### 方法2: コマンドプロンプトを使用
 
-2. **依存関係をインストール（初回のみ）**
-   ```powershell
-   npm install
-   ```
+```cmd
+# コマンドプロンプトを開く
+cd /d "C:\path\to\your\project"
+set NODE_ENV=development
+set VITE_LOCAL=true
+npx cross-env NODE_ENV=development VITE_LOCAL=true tsx server/index.ts
+```
 
-3. **アプリをビルド（初回のみ）**
-   ```powershell
-   npm run build
-   ```
-
-4. **サーバーを起動**
-   ```powershell
-   node server/index.local.cjs
-   ```
-
-5. **ブラウザでアクセス**
-   - 自動で開かない場合: http://localhost:5000
-
-### 方法2: コマンドプロンプトから起動
-
-1. **フォルダ内でコマンドプロンプトを開く**
-   - フォルダのアドレスバーで `cmd` と入力してEnter
-
-2. **コマンドを順番に実行**
-   ```cmd
-   npm install
-   npm run build
-   node server\index.local.cjs
-   ```
-
-### 方法3: 文字エンコーディング修正
-
-1. **コマンドプロンプトで文字エンコーディングを設定**
-   ```cmd
-   chcp 65001
-   start-local-simple.bat
-   ```
-
-2. **または、PowerShellで**
-   ```powershell
-   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-   .\start-local-simple.bat
-   ```
-
-## 起動確認
-
-正常に起動すると以下のメッセージが表示されます：
+### 方法3: デバッグ版バッチファイル
 
 ```
-=== AIストーリービルダー ローカル版 ===
-Node.js version: v20.x.x
-Platform: win32
-
-🚀 AIストーリービルダー（ローカル版）が起動しました！
-📱 アプリケーション: http://localhost:5000
-💾 データベース: メモリストレージ
-🤖 AI: 基本補完機能 + Ollama対応
-🖥️ プラットフォーム: win32
-📊 サンプルプロジェクト: 1個
-
-終了するには Ctrl+C を押してください。
+start-dev-local-debug.bat
 ```
+このファイルは詳細なログを出力し、問題の原因を特定できます。
+
+### 方法4: 簡易版バッチファイル
+
+```
+start-dev-local-simple.bat
+```
+最小限の処理で起動します。
 
 ## トラブルシューティング
 
-### エラー「Node.jsが見つかりません」
-- Node.jsをインストール: https://nodejs.org/
-- インストール後、新しくコマンドプロンプトを開く
+### 問題: バッチファイルが瞬間的に閉じる
+**原因**: 
+- 既存のNodeプロセスとの競合
+- 環境変数の問題
+- npmの依存関係の問題
 
-### エラー「パッケージが見つかりません」
+**解決策**:
+1. タスクマネージャーでNode.jsプロセスを確認・終了
+2. PowerShellまたはコマンドプロンプトで手動実行
+3. `startup.log`ファイルでエラーログを確認
+
+### 問題: ポート5000が使用中
+```cmd
+netstat -ano | findstr :5000
+taskkill /PID <プロセスID> /F
+```
+
+### 問題: npm install失敗
 ```cmd
 npm cache clean --force
 npm install
 ```
 
-### エラー「ポートが使用中」
-- 他のNode.jsプロセスを終了
-- またはアプリが自動で別ポート（5001等）を使用
+## 確実な起動手順
 
-### ブラウザが開かない
-手動でアクセス：
-- http://localhost:5000
-- または http://localhost:5001
+1. **既存プロセス確認**
+   ```cmd
+   tasklist | findstr node
+   ```
 
-### データが保存されない
-**重要**: 現在はメモリストレージのため、アプリを終了するとデータは消失します。
-- 重要な内容は別途保存してください
+2. **プロジェクトフォルダに移動**
+   ```cmd
+   cd /d "プロジェクトのパス"
+   ```
 
-## アプリの使い方
+3. **依存関係インストール**
+   ```cmd
+   npm install
+   ```
 
-### プロジェクト作成後の操作
-1. **サイドバー**: 左側のメニューで各ステップを選択
-2. **キャラクター**: AIボタンで自動補完
-3. **プロット**: 構成提案機能
-4. **あらすじ**: キャラクター・プロット情報から自動生成
+4. **開発サーバー起動**
+   ```cmd
+   npx cross-env NODE_ENV=development VITE_LOCAL=true tsx server/index.ts
+   ```
 
-### データの永続化について
-現在のローカル版は**一時保存**です：
-- アプリ終了時にデータ消失
-- 将来のアップデートで永続保存機能を追加予定
-- 現在は作業中のテキストを定期的にコピー保存推奨
+5. **ブラウザでアクセス**
+   http://localhost:5000
 
-## 最終手段
+## 成功時の表示例
 
-すべて失敗した場合：
-1. Node.js v18以上が正しくインストールされていることを確認
-2. フォルダの読み書き権限を確認
-3. ウイルス対策ソフトの除外設定
-4. Windowsの文字コード設定を確認
+```
+8:48:37 AM [express] serving on port 5000
+```
+
+この表示が出れば正常に起動しています。
