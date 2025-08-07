@@ -1,91 +1,95 @@
-# Windows 11 クイックスタートガイド
+# Windows クイックスタートガイド
 
-Windows 11でAIストーリービルダーを最速で起動する手順です。
+## 🎯 最も確実な起動方法
 
-## 📥 1分セットアップ
+### 方法1: PowerShellスクリプト（推奨）
 
-### ステップ1: 必須ソフトウェア
-1. **Node.js** をダウンロード・インストール
-   - https://nodejs.org/ → 推奨版（LTS）をダウンロード
-   - インストール時はすべてデフォルト設定でOK
-
-2. **Ollama** をダウンロード・インストール（AI機能用）
-   - https://ollama.ai/ → "Download for Windows" をクリック
-   - インストール後、コマンドプロンプトで実行：
-   ```
-   ollama pull llama3.2:3b
-   ```
-
-### ステップ2: アプリ起動
-1. **start-local.bat** をダブルクリック
-2. 初回は自動セットアップが実行されます（1-3分）
-3. ブラウザが自動で開き、アプリが起動します
-4. 黒いウィンドウ（コンソール）は最小化してOK
-
-## ❗ よくある問題と解決法
-
-### 🚫 start-local.bat がすぐ閉じる
-**解決法1**: コマンドプロンプトから実行
-1. フォルダ内で「Shift + 右クリック」→「PowerShellウィンドウをここで開く」
-2. `start-local.bat` と入力して実行
-
-**解決法2**: 手動で起動
-```cmd
-node server\index.local.cjs
+```powershell
+# PowerShellで実行
+cd "C:\Users\Uniso\Desktop\StoryCraftAI20"
+.\start-windows.ps1
 ```
 
-### 📦 「Node.jsが見つかりません」
-1. Node.jsのインストール後、コマンドプロンプトを**再起動**
-2. `node --version` で確認
-
-### ⚠️ 「依存関係インストール失敗」
-1. start-local.bat を右クリック → **管理者として実行**
-2. ウイルス対策ソフトの除外設定にフォルダを追加
-
-### 🌐 「ポート使用中」エラー
-- アプリは自動で別ポート（5001等）を使用します
-- ブラウザのタブを閉じて再実行
-
-### 🤖 AIが動作しない
-**基本機能**: すぐ使用可能（簡易的な補完）
-**Ollama機能**: `ollama pull llama3.2:3b` でモデル追加
-
-## 🔧 手動セットアップ（上級者向け）
-
-バッチファイルが動作しない場合の手動手順：
+### 方法2: 完全セットアップ
 
 ```cmd
-REM 1. 依存関係インストール
+# コマンドプロンプトで実行
+cd "C:\Users\Uniso\Desktop\StoryCraftAI20"  
+install-and-start.cmd
+```
+
+### 方法3: 手動起動（確実）
+
+```cmd
+# Step 1: プロジェクトフォルダに移動
+cd "C:\Users\Uniso\Desktop\StoryCraftAI20"
+
+# Step 2: 依存関係をインストール
 npm install
 
-REM 2. アプリビルド
-npm run build
+# Step 3: tsx をグローバルインストール
+npm install -g tsx
 
-REM 3. 起動
-node server/index.local.js
+# Step 4: 環境変数を設定して起動
+set NODE_ENV=development
+set VITE_LOCAL=true
+set DATABASE_URL=
+tsx server/index.ts
 ```
 
-ブラウザで http://localhost:5000 にアクセス
+## ⚡ PowerShell実行ポリシーエラーの解決
 
-## 📊 システム要件
+PowerShellで実行ポリシーエラーが出る場合：
 
-- **OS**: Windows 11 / Windows 10
-- **メモリ**: 8GB以上推奨（Ollama使用時）
-- **ストレージ**: 5GB以上の空き容量
-- **ネットワーク**: 初回セットアップ時のみ必要
+```powershell
+# 管理者権限でPowerShellを開く
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-## 🚀 使い方
+# その後、通常のPowerShellで実行
+.\start-windows.ps1
+```
 
-1. **新プロジェクト作成** → 物語のタイトルとジャンルを入力
-2. **キャラクター設定** → AIボタンで空欄を自動補完
-3. **プロット構成** → AI提案で起承転結を生成
-4. **あらすじ作成** → キャラクターとプロットから自動生成
+## 🔧 トラブルシューティング
 
-## 💾 データ保存先
+### エラー: バッチファイルが認識されない
+**原因**: PowerShellは現在ディレクトリのバッチファイルを自動実行しない
+**解決**: `.\ファイル名` を使用
 
-- プロジェクトデータ: `%APPDATA%\AIストーリービルダー\local.db`
-- バックアップ推奨: 定期的にlocal.dbファイルをコピー保存
+### エラー: tsx が見つからない
+**解決**: 
+```cmd
+npm install -g tsx
+```
 
----
+### エラー:権限不足
+**解決**: 
+- コマンドプロンプトを管理者として実行
+- またはPowerShellを管理者として実行
 
-**問題が解決しない場合**: LOCAL_SETUP_GUIDE.md の詳細版を参照してください。
+### エラー: ポート5000が使用中
+**解決**:
+```cmd
+netstat -ano | findstr :5000
+taskkill /PID <プロセスID> /F
+```
+
+## ✅ 成功時の表示
+
+正常起動時は以下が表示されます：
+
+```
+[express] serving on port 5000
+```
+
+その後、ブラウザで http://localhost:5000 にアクセスできます。
+
+## 🎮 アプリケーション機能
+
+起動成功後は以下の機能が利用可能です：
+- プロジェクト作成・管理
+- キャラクター設定
+- プロット構築  
+- あらすじ作成
+- 章立て・エピソード作成
+- 下書き生成
+- AI補完機能（基本 + Ollama対応）

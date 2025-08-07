@@ -12,7 +12,7 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 - **Data Persistence**: Implemented full memory storage with project, character, plot, synopsis, and chapter management
 - **AI Function Restoration**: Added comprehensive AI completion system with Ollama integration and enhanced fallback responses
 - **Manual Startup Guide**: Created detailed MANUAL_STARTUP.md with PowerShell/CMD alternatives for Windows compatibility
-- **Windows 11 Batch Fix**: Created multiple startup methods (debug, simple, manual) to resolve instant window closure issue
+- **Windows 11 Complete Fix**: Created comprehensive Windows startup solutions including PowerShell scripts, complete setup commands, and manual installation guides to resolve all execution issues
 - **API Endpoint Coverage**: Implemented complete REST API with proper error handling and logging for all features
 - **Local LLM Support**: Full Ollama integration with llama3.2:3b model support and automatic fallback to basic completions
 
@@ -25,12 +25,24 @@ Preferred communication style: Simple, everyday language.
 **重要**: プレビュー版と同等の機能を使用するには、以下の起動方法を使用してください：
 
 ### 推奨起動方法（完全機能）
+
+**PowerShell（最も確実）:**
+```powershell
+.\start-windows.ps1
 ```
-start-build.bat
+
+**コマンドプロンプト:**
+```cmd
+install-and-start.cmd
 ```
-または
-```
-start-simple.bat
+
+**手動起動:**
+```cmd
+npm install -g tsx
+set NODE_ENV=development
+set VITE_LOCAL=true  
+set DATABASE_URL=
+tsx server/index.ts
 ```
 この方法では：
 - Vite開発サーバーを使用
