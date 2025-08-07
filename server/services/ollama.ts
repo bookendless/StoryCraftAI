@@ -1,11 +1,28 @@
-// @ts-ignore
-import { Ollama } from 'ollama';
+// Windows互換のOllama統合
+let ollama: any = null;
 
-// ローカルOllamaクライアント
-const ollama = new Ollama({ host: 'http://localhost:11434' });
+// 動的にOllamaをインポート
+const initializeOllama = async () => {
+  try {
+    const { Ollama } = await import('ollama');
+    ollama = new Ollama({ host: 'http://localhost:11434' });
+    return true;
+  } catch (error) {
+    console.warn('Ollama モジュールの読み込みに失敗しました:', error);
+    return false;
+  }
+};
+
+// 初期化を実行
+initializeOllama();
 
 export async function checkOllamaConnection(): Promise<boolean> {
   try {
+    if (!ollama) {
+      const initialized = await initializeOllama();
+      if (!initialized) return false;
+    }
+    
     await ollama.list();
     return true;
   } catch (error) {
@@ -16,8 +33,13 @@ export async function checkOllamaConnection(): Promise<boolean> {
 
 export async function getAvailableModels(): Promise<string[]> {
   try {
+    if (!ollama) {
+      const initialized = await initializeOllama();
+      if (!initialized) return [];
+    }
+    
     const models = await ollama.list();
-    return models.models.map(model => model.name);
+    return models.models.map((model: any) => model.name);
   } catch (error) {
     console.error("モデル取得エラー:", error);
     return [];
@@ -29,6 +51,13 @@ export async function generateWithOllama(
   model: string = 'llama3.2:3b'
 ): Promise<string> {
   try {
+    if (!ollama) {
+      const initialized = await initializeOllama();
+      if (!initialized) {
+        throw new Error('Ollama が利用できません。Ollamaがインストールされ、起動していることを確認してください。');
+      }
+    }
+    
     const response = await ollama.generate({
       model,
       prompt,

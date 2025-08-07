@@ -1,12 +1,29 @@
 import express from "express";
 import { createServer } from "http";
-import { join, dirname } from "path";
+import { join, dirname, resolve } from "path";
 import { fileURLToPath } from "url";
-import { localStorage } from "./storage.local";
-import { checkOllamaConnection, getAvailableModels } from "./services/ollama";
+import { existsSync } from "fs";
+import { localStorage } from "./storage.local.js";
+import { checkOllamaConnection, getAvailableModels } from "./services/ollama.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// Windows互換のパス設定
+const getAppPaths = () => {
+  let __filename: string;
+  let __dirname: string;
+
+  if (import.meta.url) {
+    __filename = fileURLToPath(import.meta.url);
+    __dirname = dirname(__filename);
+  } else {
+    // CommonJSフォールバック
+    __filename = __filename || '';
+    __dirname = __dirname || process.cwd();
+  }
+
+  return { __filename, __dirname };
+};
+
+const { __filename, __dirname } = getAppPaths();
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -16,7 +33,12 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static files - serve the built client
-app.use(express.static(join(__dirname, '../client/dist')));
+const clientDistPath = existsSync(join(__dirname, '../client/dist')) 
+  ? join(__dirname, '../client/dist')
+  : join(__dirname, '../dist/public');
+
+console.log('静的ファイルパス:', clientDistPath);
+app.use(express.static(clientDistPath));
 
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
@@ -35,21 +57,36 @@ app.get('/api/health', async (req, res) => {
 });
 
 // Register API routes with local storage
-import { registerLocalRoutes } from "./routes.local";
+const { registerLocalRoutes } = await import("./routes.local.js");
 registerLocalRoutes(app);
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, '../client/dist/index.html'));
+  const indexPath = existsSync(join(__dirname, '../client/dist/index.html'))
+    ? join(__dirname, '../client/dist/index.html')
+    : join(__dirname, '../dist/public/index.html');
+  
+  res.sendFile(resolve(indexPath));
 });
 
 const server = createServer(app);
 
-server.listen(port, () => {
+server.listen(port, '0.0.0.0', () => {
   console.log(`🚀 AIストーリービルダー（ローカル版）がポート ${port} で起動しました`);
   console.log(`📱 アプリケーション: http://localhost:${port}`);
-  console.log(`💾 データベース: SQLite (local.db)`);
+  console.log(`💾 データベース: SQLite (${process.platform === 'win32' ? 'AppData内' : 'local.db'})`);
   console.log(`🤖 AI: Ollama (http://localhost:11434)`);
+  console.log(`🖥️ プラットフォーム: ${process.platform}`);
+});
+
+// エラーハンドリング
+server.on('error', (err: any) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`ポート ${port} は既に使用されています。他のポートを試します...`);
+    server.listen(port + 1, '0.0.0.0');
+  } else {
+    console.error('サーバーエラー:', err);
+  }
 });
 
 export { server };

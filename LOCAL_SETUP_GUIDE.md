@@ -27,34 +27,37 @@ ollama list
 
 ## 🚀 セットアップ手順
 
-### 1. プロジェクトのクローン/ダウンロード
-```bash
-# GitHubからクローンする場合
-git clone [repository-url]
-cd ai-story-builder
+### 1. プロジェクトのダウンロード
+配布用ZIPファイルを任意のフォルダに展開してください。
 
-# または配布用ZIPファイルを展開
+### 2. Node.js のインストール（必須）
+1. [Node.js公式サイト](https://nodejs.org/)からダウンロード
+2. **推奨版（LTS）** をインストール（18.x以上）
+3. インストール確認：
+```bash
+# コマンドプロンプト／PowerShellで確認
+node --version
+npm --version
 ```
 
-### 2. 依存関係のインストール
+### 3. Ollama のインストール（AI機能用）
+1. [Ollama公式サイト](https://ollama.ai/)からダウンロード
+2. Windowsインストーラーを実行
+3. 推奨モデルをダウンロード：
 ```bash
-npm install
+# コマンドプロンプトで実行
+ollama pull llama3.2:3b
 ```
 
-### 3. ローカルデータベースの初期化
-```bash
-# SQLiteデータベースのセットアップ
-npm run db:push:local
-```
+### 4. アプリケーションの起動
+**Windows**: `start-local.bat` をダブルクリック
+**その他**: ターミナルで `./start-local.sh` を実行
 
-### 4. Ollamaサービスの起動確認
-```bash
-# Ollamaが起動しているか確認
-curl http://localhost:11434/api/tags
-
-# レスポンス例：
-# {"models":[{"name":"llama3.2:3b","modified_at":"..."}]}
-```
+初回起動時は自動的に：
+- 依存関係のインストール
+- アプリケーションのビルド
+- データベースの初期化
+が実行されます。
 
 ## 🖥️ 起動方法
 
