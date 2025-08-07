@@ -26,7 +26,11 @@ Preferred communication style: Simple, everyday language.
 
 ### 推奨起動方法（完全機能）
 ```
-start-dev-local.bat
+start-build.bat
+```
+または
+```
+start-simple.bat
 ```
 この方法では：
 - Vite開発サーバーを使用

@@ -2,12 +2,18 @@
 
 ## バッチファイルが閉じてしまう場合の解決方法
 
-### 方法1: Node.jsスクリプト使用（推奨）
+### 方法1: ビルド版バッチファイル（推奨）
 
 ```cmd
-# コマンドプロンプトまたはPowerShell
-cd "C:\Users\Uniso\Desktop\StoryCraftAI20"
-node package-scripts.js
+# 最も確実な方法
+start-build.bat
+```
+
+### 方法1-2: 簡易バッチファイル
+
+```cmd
+# 自動フォールバック付き
+start-simple.bat
 ```
 
 ### 方法2: ビルド版を使用
