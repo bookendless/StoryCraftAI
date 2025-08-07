@@ -2,26 +2,41 @@
 
 ## バッチファイルが閉じてしまう場合の解決方法
 
-### 方法1: PowerShellを使用（推奨）
-
-```powershell
-# PowerShellを管理者として実行
-Set-Location "C:\path\to\your\project"
-$env:NODE_ENV="development"
-$env:VITE_LOCAL="true"
-$env:DATABASE_URL=""
-npx cross-env NODE_ENV=development VITE_LOCAL=true DATABASE_URL="" tsx server/index.ts
-```
-
-### 方法2: コマンドプロンプトを使用
+### 方法1: Node.jsスクリプト使用（推奨）
 
 ```cmd
-# コマンドプロンプトを開く
-cd /d "C:\path\to\your\project"
+# コマンドプロンプトまたはPowerShell
+cd "C:\Users\Uniso\Desktop\StoryCraftAI20"
+node package-scripts.js
+```
+
+### 方法2: ビルド版を使用
+
+```cmd
+# プロジェクトフォルダで実行
+cd "C:\Users\Uniso\Desktop\StoryCraftAI20"
+npm run build
 set NODE_ENV=development
 set VITE_LOCAL=true
 set DATABASE_URL=
-npx cross-env NODE_ENV=development VITE_LOCAL=true DATABASE_URL="" tsx server/index.ts
+node dist/index.js
+```
+
+### 方法3: バッチファイル使用
+
+```cmd
+start-dev-local-nodejs.bat
+```
+
+### 方法4: PowerShell（tsx不要）
+
+```powershell
+cd "C:\Users\Uniso\Desktop\StoryCraftAI20"
+npm run build
+$env:NODE_ENV="development"
+$env:VITE_LOCAL="true"
+$env:DATABASE_URL=""
+node dist/index.js
 ```
 
 ### 方法3: デバッグ版バッチファイル
@@ -40,11 +55,17 @@ start-dev-local-simple.bat
 
 ## トラブルシューティング
 
+### 問題: tsxが見つからない
+**原因**: 
+- TypeScriptランタイム（tsx）がグローバルにインストールされていない
+- ローカルのnode_modulesにtsxがない
+
 ### 問題: バッチファイルが瞬間的に閉じる
 **原因**: 
 - 既存のNodeプロセスとの競合
 - 環境変数の問題
 - npmの依存関係の問題
+- tsxの不足
 
 **解決策**:
 1. タスクマネージャーでNode.jsプロセスを確認・終了
