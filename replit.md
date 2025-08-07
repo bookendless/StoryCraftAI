@@ -19,6 +19,33 @@ This is a Japanese novel/story writing application that provides AI-assisted cre
 
 Preferred communication style: Simple, everyday language.
 
+## ローカル環境での完全機能利用方法
+
+**重要**: プレビュー版と同等の機能を使用するには、以下の起動方法を使用してください：
+
+### 推奨起動方法（完全機能）
+```
+start-dev-local.bat
+```
+この方法では：
+- Vite開発サーバーを使用
+- ホットリロード対応
+- メモリ内データストレージ
+- AI補完機能
+- サイドバーナビゲーション
+- プロジェクト管理機能
+
+### 従来の起動方法（制限あり）
+```
+start-local-simple.bat
+```
+この方法では基本機能のみ利用可能
+
+### 技術的な違い
+- プレビュー版: Vite開発サーバー + PostgreSQL
+- 完全ローカル版: Vite開発サーバー + メモリストレージ
+- 簡易ローカル版: 静的ファイル提供 + ローカルサーバー
+
 ## System Architecture
 
 ### Frontend Architecture

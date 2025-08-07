@@ -96,6 +96,7 @@ export class MemStorage implements IStorage {
       ...insertProject, 
       id, 
       description: insertProject.description ?? null,
+      imageUrl: insertProject.imageUrl ?? null,
       currentStep: insertProject.currentStep ?? 1,
       progress: insertProject.progress ?? 0,
       createdAt: now,
@@ -156,6 +157,8 @@ export class MemStorage implements IStorage {
       id,
       role: insertCharacter.role ?? null,
       description: insertCharacter.description ?? null,
+      imageUrl: insertCharacter.imageUrl ?? null,
+      affiliation: insertCharacter.affiliation ?? null,
       personality: insertCharacter.personality ?? null,
       background: insertCharacter.background ?? null,
       order: insertCharacter.order ?? 0
@@ -550,4 +553,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Use MemStorage for local development to avoid database connection issues
+export const storage = process.env.VITE_LOCAL === "true" ? new MemStorage() : new DatabaseStorage();
