@@ -34,14 +34,8 @@ if [ ! -d "dist" ]; then
     fi
 fi
 
-# SQLiteデータベースの初期化
-if [ ! -f "local.db" ]; then
-    echo "データベースを初期化しています..."
-    npm run db:push:local
-    if [ $? -ne 0 ]; then
-        echo "警告: データベース初期化に失敗しました。アプリが正常に動作しない可能性があります。"
-    fi
-fi
+# データベースの初期化は不要（メモリストレージ使用）
+echo "データベース: メモリストレージを使用（データは一時保存）"
 
 echo ""
 echo "================================"
@@ -59,4 +53,4 @@ echo ""
 
 # ローカルサーバーを起動
 export NODE_ENV=local
-node server/index.local.js
+node server/index.local.cjs

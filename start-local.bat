@@ -37,14 +37,8 @@ if not exist "dist" (
     )
 )
 
-REM SQLiteデータベースの初期化
-if not exist "local.db" (
-    echo データベースを初期化しています...
-    npm run db:push:local
-    if errorlevel 1 (
-        echo 警告: データベース初期化に失敗しました。アプリが正常に動作しない可能性があります。
-    )
-)
+REM データベースの初期化は不要（メモリストレージ使用）
+echo データベース: メモリストレージを使用（データは一時保存）
 
 echo.
 echo ================================
@@ -58,12 +52,13 @@ echo.
 echo サーバー起動後、ブラウザで http://localhost:5000 にアクセス
 echo または、このウィンドウを最小化してください。
 echo.
-echo 終了するには Ctrl+C を押してください。
+echo 起動完了後、このウィンドウは最小化しても構いません。
+echo 終了するには このウィンドウで Ctrl+C を押してください。
 echo.
 
 REM ローカルサーバーを起動
 set NODE_ENV=local
-node server/index.local.js
+node server/index.local.cjs
 
 echo.
 echo AIストーリービルダーが終了しました。

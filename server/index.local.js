@@ -1,8 +1,19 @@
+// CommonJS版ローカルサーバー（Windows 11対応）
 const express = require("express");
 const { createServer } = require("http");
 const { join, dirname, resolve } = require("path");
 const { existsSync, mkdirSync } = require("fs");
-const Database = require('better-sqlite3');
+
+console.log('Node.js version:', process.version);
+console.log('Platform:', process.platform);
+console.log('Working directory:', process.cwd());
+
+// 最低限の依存関係で動作させるため、SQLiteは後で初期化
+let Database = null;
+try {
+  Database = require('better-sqlite3');
+} catch (error) {
+  console.warn('SQLite not available, using memory storage');
 
 // Windows互換のパス設定
 const getDataPath = () => {
